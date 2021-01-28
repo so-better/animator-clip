@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>animator</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+	</head>
+	<body style="overflow: hidden;">
+		<button type="button" onclick="reset()">重置</button>
+		<button type="button" onclick="start()">开始</button>
+		<button type="button" onclick="stop()">停止</button>
+		<button type="button" onclick="getClips()">获取正在运行的clips</button>
+		<div style="width: 60px;height: 100px;background-color: #FF0000;position: absolute;left: 100px;top: 0px;" id="el"></div>
+	</body>
+	<script src="../dist/animator-clip.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+		const {Animator,Clip} = AnimatorClip;
+		var scale = 1;
+		var animator = new Animator('#el',{
+			start(){
+				console.log('animator start')
+			},
+			stop(){
+				console.log('animator stop')
+			},
+			reset(){
+				this.$el.style.transform = '';
+				scale = 1;
+				console.log('animator reset')
+			},
+			complete(){
+				console.log('animator complete')
+			},
+			update(clip,style,value){
+				var diff = scale - 0.01;
+				if(diff>0.3){
+					this.$el.style.transform = 'scale('+diff+')';
+					scale = diff;
+				}
+			}
+		})
+		var clip = new Clip({
+			style:'top',
+			value:'400px',
+			speed:4
+		})
+		var clip2 = new Clip({
+			style:'width',
+			value:'600px',
+			speed:4
+		})
+		animator.addClip(clip).addClip(clip2);
+		
+		/* clip.on('start',()=>{
+			console.log('clip start')
+		})
+		clip.on('stop',()=>{
+			console.log('clip stop')
+		})
+		clip.on('reset',()=>{
+			console.log('clip reset')
+		})
+		clip.on('complete',()=>{
+			console.log('clip complete')
+		}) */
+		
+		//animator.start();
+		
+		function start(){
+			animator.start();
+		}
+		function stop(){
+			animator.stop()
+		}
+		function reset(){
+			animator.reset();
+		}
+		
+		function getClips(){
+			console.log(animator.getClips());
+		}
+	</script>
+</html>
