@@ -1,6 +1,6 @@
 {
 	"name": "animator-clip",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "一个基于requestAnimationFrame封装的轻量级JS动画插件",
 	"main": "src/index.js",
 	"scripts": {

@@ -31,10 +31,8 @@ class Clip {
 		} else if (typeof this.value == 'string') {
 			if (this.value.endsWith('px')) {
 				this.$unit = 'px';
-			} else if (this.value.endsWith('rem')) {
-				this.$unit = 'rem';
-			}else {
-				throw new Error('currently, only attribute values for px and rem units are supported')
+			} else {
+				throw new Error('currently, only attribute values for px units are supported')
 			}
 			this.value = parseFloat(this.value);
 		} else {
@@ -129,7 +127,12 @@ class Clip {
 				return;
 			}
 			//设置样式
-			this.$parent.$el.style.setProperty(this.style, (initValue + this.speed) + this.$unit, 'important');
+			if(this.$unit){
+				this.$parent.$el.style.setProperty(this.style, (initValue + this.speed) + this.$unit, 'important');
+			}else{
+				this.$parent.$el.style.setProperty(this.style, initValue + this.speed, 'important');
+			}
+			
 			//获取新的属性值
 			let newValue = parseFloat(this._getCssStyle(this.style));
 			//clip触发update事件
