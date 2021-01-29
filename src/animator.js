@@ -87,6 +87,7 @@ class Animator {
 		if(index > -1){
 			this.clips.splice(index,1);
 		}
+		return this;
 	}
 
 	/**
@@ -135,6 +136,7 @@ class Animator {
 		this.clips.forEach(clip=>{
 			clip.start();
 		})
+		return this;
 	}
 
 	/**
@@ -144,6 +146,7 @@ class Animator {
 		this.clips.forEach(clip=>{
 			clip.stop();
 		})
+		return this;
 	}
 
 	/**
@@ -153,6 +156,7 @@ class Animator {
 		this.clips.forEach(clip=>{
 			clip.reset();
 		})
+		return this;
 	}
 
 }

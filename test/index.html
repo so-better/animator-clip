@@ -16,7 +16,7 @@
 	<script>
 		const {Animator,Clip} = AnimatorClip;
 		var scale = 1;
-		var animator = new Animator('#el',{
+		var animator = new Animator ('#el',{
 			start(){
 				console.log('animator start')
 			},
@@ -42,8 +42,7 @@
 		var clip = new Clip({
 			style:'top',
 			value:'400px',
-			speed:4,
-			delay:400
+			speed:4
 		})
 		var clip2 = new Clip({
 			style:'width',

@@ -153,6 +153,7 @@ class Clip {
 			}
 		}
 		this.$requestAnimationFrame.call(window, doFun);
+		return this;
 	}
 
 	/**
@@ -176,6 +177,7 @@ class Clip {
 		if(this.$parent.getStopClips().length + this.$parent.getCompleteClips().length == this.$parent.clips.length){
 			this.$parent.$options.stop.call(this.$parent);
 		}
+		return this;
 	}
 
 	/**
@@ -201,6 +203,7 @@ class Clip {
 		if(this.$parent.getCompleteClips().length == 0 && this.$parent.getStopClips().length == 0 && this.$parent.getClips().length == 0){
 			this.$parent.$options.reset.call(this.$parent)
 		}
+		return this;
 	}
 
 	/**
@@ -213,6 +216,7 @@ class Clip {
 		} else {
 			throw new Error(eventName + ' is an illegal event')
 		}
+		return this;
 	}
 
 	/**
