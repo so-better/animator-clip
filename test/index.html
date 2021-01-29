@@ -10,7 +10,7 @@
 		<button type="button" onclick="start()">开始</button>
 		<button type="button" onclick="stop()">停止</button>
 		<button type="button" onclick="getClips()">获取正在运行的clips</button>
-		<div style="width: 60px;height: 100px;background-color: #FF0000;position: absolute;left: 100px;top: 0px;" id="el"></div>
+		<div style="width: 60px;height: 100px;background-color: #FF0000;position: absolute;left: 100px;top: 100px;" id="el"></div>
 	</body>
 	<script src="../dist/animator-clip.js" type="text/javascript" charset="utf-8"></script>
 	<script>
@@ -42,7 +42,8 @@
 		var clip = new Clip({
 			style:'top',
 			value:'400px',
-			speed:4
+			speed:4,
+			delay:400
 		})
 		var clip2 = new Clip({
 			style:'width',
@@ -50,8 +51,9 @@
 			speed:4
 		})
 		animator.addClip(clip).addClip(clip2);
+		//clip.chain(clip2);
 		
-		/* clip.on('start',()=>{
+		clip.on('start',()=>{
 			console.log('clip start')
 		})
 		clip.on('stop',()=>{
@@ -62,7 +64,7 @@
 		})
 		clip.on('complete',()=>{
 			console.log('clip complete')
-		}) */
+		})
 		
 		//animator.start();
 		
@@ -70,7 +72,7 @@
 			animator.start();
 		}
 		function stop(){
-			animator.stop()
+			animator.removeClip(clip)
 		}
 		function reset(){
 			animator.reset();

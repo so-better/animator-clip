@@ -4,6 +4,7 @@ class Animator {
 		this.$el = el;
 		this.$options = options;
 		this.clips = [];
+		this.$triggerStart = false;
 		this._init();
 	}
 
@@ -62,7 +63,7 @@ class Animator {
 	}
 
 	/**
-	 * 将clip移除队列
+	 * 将clip移出队列
 	 */
 	removeClip(clip){
 		if(!(clip instanceof Clip)){
@@ -75,7 +76,10 @@ class Animator {
 		let length = this.clips.length;
 		for(let i = 0;i<length;i++){
 			if(clip === this.clips[i]){
-				clip.reset();
+				clip.$status = 0;//重置初始状态
+				clip.$parent.$el.style.setProperty(clip.style, clip.$initValue, 'important');//恢复初始属性值
+				clip.$initValue = null;//重置初始属性值
+				clip.$parent = null;//重置父对象
 				index = i;
 				break;
 			}
@@ -91,7 +95,33 @@ class Animator {
 	getClips(){
 		let clips = [];
 		this.clips.forEach(clip=>{
-			if(clip.status == 1){
+			if(clip.$status == 1){
+				clips.push(clip)
+			}
+		})
+		return clips;
+	}
+	
+	/**
+	 * 获取停止状态的clip
+	 */
+	getStopClips(){
+		let clips = [];
+		this.clips.forEach(clip=>{
+			if(clip.$status == 2){
+				clips.push(clip)
+			}
+		})
+		return clips;
+	}
+	
+	/**
+	 * 获取已完成的clip
+	 */
+	getCompleteClips(){
+		let clips = [];
+		this.clips.forEach(clip=>{
+			if(clip.$status == 3){
 				clips.push(clip)
 			}
 		})
@@ -102,52 +132,27 @@ class Animator {
 	 * 执行动画
 	 */
 	start() {
-		let flag = false;
 		this.clips.forEach(clip=>{
-			if(clip.status == 0 || clip.status == 2){
-				flag = true;
-				clip.start();
-			}
+			clip.start();
 		})
-		//animator触发start事件
-		if(flag){
-			this.$options.start.call(this);
-		}
 	}
 
 	/**
 	 * 停止动画
 	 */
 	stop() {
-		let flag = false;
 		this.clips.forEach(clip=>{
-			if(clip.status == 1){
-				flag = true;
-				clip.stop();
-			}
-			
+			clip.stop();
 		})
-		//animator触发stop事件
-		if(flag){
-			this.$options.stop.call(this);
-		}
 	}
 
 	/**
 	 * 重置动画
 	 */
 	reset(){
-		let flag = false;
 		this.clips.forEach(clip=>{
-			if(clip.status != 0){
-				flag = true;
-				clip.reset();
-			}
+			clip.reset();
 		})
-		//animator触发reset事件
-		if(flag){
-			this.$options.reset.call(this)
-		}
 	}
 
 }

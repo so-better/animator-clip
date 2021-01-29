@@ -9,9 +9,9 @@ class Clip {
 		this.style = options.style; //样式名称
 		this.value = options.value; //样式最终值
 		this.speed = options.speed; //动画速度，即每次样式改变的量
-		this.unit = null; //样式单位，无单位则为null
-		this.requestAnimationFrame = null;
-		this.status = 0; //0表示动画初始状态，1表示动画进行状态，2表示动画停止状态，3表示动画完成状态
+		this.$unit = null; //样式单位，无单位则为null
+		this.$requestAnimationFrame = null;
+		this.$status = 0; //0表示动画初始状态，1表示动画进行状态，2表示动画停止状态，3表示动画完成状态
 		this.$parent = null; //animator实例
 		this.$initValue = null; //属性值初始值
 		this.$events = []; //自定义事件数组
@@ -27,12 +27,12 @@ class Clip {
 			throw new Error('style is not defined')
 		}
 		if (typeof this.value == 'number') {
-			this.unit = null;
+			this.$unit = null;
 		} else if (typeof this.value == 'string') {
 			if (this.value.endsWith('px')) {
-				this.unit = 'px';
+				this.$unit = 'px';
 			} else if (this.value.endsWith('rem')) {
-				this.unit = 'rem';
+				this.$unit = 'rem';
 			}else {
 				throw new Error('currently, only attribute values for px and rem units are supported')
 			}
@@ -47,10 +47,9 @@ class Clip {
 		if (typeof this.speed != 'number') {
 			this.speed = 0;
 		}
-
 		//动画函数初始化
-		this.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;
-		if (!this.requestAnimationFrame) {
+		this.$requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;
+		if (!this.$requestAnimationFrame) {
 			throw new ReferenceError('browser does not support requestAnimationFrame');
 		}
 
@@ -102,17 +101,23 @@ class Clip {
 			return;
 		}
 		//如果已经是进行状态或者完成状态，则不进行动画
-		if (this.status == 1 || this.status == 3) {
+		if (this.$status == 1 || this.$status == 3) {
 			return;
 		}
 		//更改帧状态
-		this.status = 1;
+		this.$status = 1;
 		//clip触发start事件
 		this._emit('start');
+		//animator触发start事件
+		//当第一个动画执行时就触发，且执行多个动画时只触发一次
+		if(!this.$parent.$triggerStart){
+			this.$parent.$options.start.call(this.$parent);
+			this.$parent.$triggerStart = true;
+		}
 		//动画帧执行函数
 		let doFun = () => {
 			//每一帧运行时判断是否处在运行状态
-			if (this.status != 1) {
+			if (this.$status != 1) {
 				return;
 			}
 			//每一帧运行时判断是否达到目标属性值
@@ -124,7 +129,7 @@ class Clip {
 				return;
 			}
 			//设置样式
-			this.$parent.$el.style.setProperty(this.style, (initValue + this.speed) + this.unit, 'important');
+			this.$parent.$el.style.setProperty(this.style, (initValue + this.speed) + this.$unit, 'important');
 			//获取新的属性值
 			let newValue = parseFloat(this._getCssStyle(this.style));
 			//clip触发update事件
@@ -132,22 +137,22 @@ class Clip {
 			//animator触发update事件
 			this.$parent.$options.update.apply(this.$parent, [this, this.style, newValue])
 			if (this.speed > 0 && newValue < this.value) {
-				this.requestAnimationFrame.call(window, doFun)
+				this.$requestAnimationFrame.call(window, doFun)
 			} else if (this.speed < 0 && newValue > this.value) {
-				this.requestAnimationFrame.call(window, doFun)
+				this.$requestAnimationFrame.call(window, doFun)
 			} else {
 				//动画运行结束，修改状态
-				this.status = 3;
+				this.$status = 3;
 				//clip触发complete事件
 				this._emit('complete');
 				//动画全部结束
-				if (this.$parent.getClips().length == 0) {
+				if (this.$parent.getCompleteClips().length == this.$parent.clips.length) {
 					//animator触发complete事件
 					this.$parent.$options.complete.call(this.$parent)
 				}
 			}
 		}
-		this.requestAnimationFrame.call(window, doFun)
+		this.$requestAnimationFrame.call(window, doFun);
 	}
 
 	/**
@@ -158,13 +163,19 @@ class Clip {
 			throw new ReferenceError('Clip instance shoud be added to the Animator instance')
 		}
 		//非运行状态的动画帧无法停止
-		if (this.status != 1) {
+		if (this.$status != 1) {
 			return;
 		}
 		//修改状态
-		this.status = 2;
+		this.$status = 2;
+		this.$parent.$triggerStart = false;
 		//clip触发stop事件
 		this._emit('stop')
+		//animator触发stop事件
+		//停止的clip数量+完成的clip数量=所有的clip数量
+		if(this.$parent.getStopClips().length + this.$parent.getCompleteClips().length == this.$parent.clips.length){
+			this.$parent.$options.stop.call(this.$parent);
+		}
 	}
 
 	/**
@@ -175,15 +186,21 @@ class Clip {
 			throw new ReferenceError('Clip instance shoud be added to the Animator instance')
 		}
 		//初始状态的动画帧无需重置
-		if (this.status == 0) {
+		if (this.$status == 0) {
 			return;
 		}
 		//修改状态
-		this.status = 0;
+		this.$status = 0;
+		this.$parent.$triggerStart = false;
 		//恢复初始属性值
 		this.$parent.$el.style.setProperty(this.style, this.$initValue, 'important');
 		//clip触发reset事件
 		this._emit('reset')
+		//animator触发reset事件
+		//全部clip变为初始状态
+		if(this.$parent.getCompleteClips().length == 0 && this.$parent.getStopClips().length == 0 && this.$parent.getClips().length == 0){
+			this.$parent.$options.reset.call(this.$parent)
+		}
 	}
 
 	/**
