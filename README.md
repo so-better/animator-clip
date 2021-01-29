@@ -1,7 +1,7 @@
 ### animator-clip
 ###### 基于requestAnimationFrame封装的轻量级JS动画插件
 
-> animator-clip是一个基于JavaScript的requestAnimationFrame API 封装的轻量级JS动画插件，用以执行简单的css样式变更动画，仅支持样式值为px单位或者rem单位的属性变更，使用的时候请注意。
+> animator-clip是一个基于JavaScript的requestAnimationFrame API 封装的轻量级JS动画插件，用以执行简单的css样式变更动画，仅支持样式值为px单位的数值或者无单位的数值属性变更，使用的时候请注意。
 
 ```
 npm install animator-clip --save
