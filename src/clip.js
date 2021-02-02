@@ -15,6 +15,8 @@ class Clip {
 		this.$parent = null; //animator实例
 		this.$initValue = null; //属性值初始值
 		this.$events = []; //自定义事件数组
+		this.$chainClip = null;//连续调用的动画
+		this.$type = 0,//0表示普通clip，1表示chain型clip
 		this._init();
 	}
 
@@ -86,7 +88,7 @@ class Clip {
 	 */
 	start() {
 		if (!this.$parent || !this.$parent.$el) {
-			throw new ReferenceError('Clip instance shoud be added to the Animator instance')
+			throw new ReferenceError('clip shoud be added to the Animator instance')
 		}
 		//获取初始属性值
 		let oldValue = parseFloat(this._getCssStyle(this.style));
@@ -148,6 +150,11 @@ class Clip {
 				this.$status = 3;
 				//clip触发complete事件
 				this._emit('complete');
+				//调用clip自身的chain型clip
+				if(this.$chainClip){
+					this.$parent.addClip(this.$chainClip);
+					this.$chainClip.start();
+				}
 				//动画全部结束
 				if (this.$parent.getCompleteClips().length == this.$parent.clips.length) {
 					//animator触发complete事件
@@ -164,7 +171,7 @@ class Clip {
 	 */
 	stop() {
 		if (!this.$parent || !this.$parent.$el) {
-			throw new ReferenceError('Clip instance shoud be added to the Animator instance')
+			throw new ReferenceError('clip shoud be added to the Animator instance')
 		}
 		//非运行状态的动画帧无法停止
 		if (this.$status != 1) {
@@ -188,7 +195,7 @@ class Clip {
 	 */
 	reset() {
 		if (!this.$parent || !this.$parent.$el) {
-			throw new ReferenceError('Clip instance shoud be added to the Animator instance')
+			throw new ReferenceError('clip shoud be added to the Animator instance')
 		}
 		//初始状态的动画帧无需重置
 		if (this.$status == 0) {
@@ -199,14 +206,32 @@ class Clip {
 		this.$parent.$triggerStart = false;
 		//恢复初始属性值
 		this.$parent.$el.style.setProperty(this.style, this.$initValue, 'important');
-		//clip触发reset事件
+		//触发clip的reset事件
 		this._emit('reset')
 		//animator触发reset事件
 		//全部clip变为初始状态
 		if(this.$parent.getCompleteClips().length == 0 && this.$parent.getStopClips().length == 0 && this.$parent.getClips().length == 0){
-			this.$parent.$options.reset.call(this.$parent)
+			this.$parent.$options.reset.call(this.$parent)	
 		}
 		return this;
+	}
+
+	/**
+	 * 连续执行动画
+	 */
+	chain(clip){
+		if(!clip){
+			throw new TypeError('clip is not defined')
+		}
+		if(!(clip instanceof Clip)){
+			throw new TypeError('clip is not a Clip instance')
+		}
+		if (clip.$parent) {
+			throw new ReferenceError('clip shoud not be added to the Animator instance')
+		}
+		this.$chainClip = clip;
+		this.$chainClip.$type = 1;
+		return clip;
 	}
 
 	/**

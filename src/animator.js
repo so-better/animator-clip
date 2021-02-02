@@ -169,8 +169,17 @@ class Animator {
 	 * 重置动画
 	 */
 	reset(){
+		var chainClips = [];
 		this.clips.forEach(clip=>{
 			clip.reset();
+			//如果是chain型clip则记录到数组内
+			if(clip.$type == 1){
+				chainClips.push(clip)
+			}
+		})
+		//遍历记录的数组，将chain型clip移除
+		chainClips.forEach(clip=>{
+			this.removeClip(clip)
 		})
 		return this;
 	}

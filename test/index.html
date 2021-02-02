@@ -43,8 +43,13 @@
 			value:0,
 			speed:-0.005
 		})
+		var clip3 = new Clip({
+			style:'left',
+			value:'400px',
+			speed:5
+		})
 		animator.addClip(clip);
-		//clip.chain(clip2);
+		clip.chain(clip3).chain(clip2);
 		
 		clip.on('start',()=>{
 			console.log('clip start')
@@ -59,14 +64,37 @@
 			console.log('clip complete')
 		})
 		
-		//animator.start();
+		clip2.on('start',()=>{
+			console.log('clip2 start')
+		})
+		clip2.on('stop',()=>{
+			console.log('clip2 stop')
+		})
+		clip2.on('reset',()=>{
+			console.log('clip2 reset')
+		})
+		clip2.on('complete',()=>{
+			console.log('clip2 complete')
+		})
+		
+		clip3.on('start',()=>{
+			console.log('clip3 start')
+		})
+		clip3.on('stop',()=>{
+			console.log('clip3 stop')
+		})
+		clip3.on('reset',()=>{
+			console.log('clip3 reset')
+		})
+		clip3.on('complete',()=>{
+			console.log('clip3 complete')
+		})
 		
 		function start(){
 			animator.start();
 		}
 		function stop(){
-			//animator.stop();
-			animator.removeAllClips()
+			animator.stop();
 		}
 		function reset(){
 			animator.reset();
