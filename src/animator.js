@@ -49,10 +49,10 @@ class Animator {
 	 */
 	addClip(clip){
 		if(!(clip instanceof Clip)){
-			throw new TypeError('param is not a Clip instance')
+			throw new TypeError('clip is not a Clip instance')
 		}
 		if(clip.$parent){
-			return;
+			return this;
 		}
 		this.clips.push(clip);
 		//设置父对象
@@ -67,10 +67,10 @@ class Animator {
 	 */
 	removeClip(clip){
 		if(!(clip instanceof Clip)){
-			throw new TypeError('param is not a Clip instance')
+			throw new TypeError('clip is not a Clip instance')
 		}
 		if(!clip.$parent){
-			return;
+			return this;
 		}
 		let index = -1;
 		let length = this.clips.length;
@@ -87,6 +87,22 @@ class Animator {
 		if(index > -1){
 			this.clips.splice(index,1);
 		}
+		return this;
+	}
+
+	/**
+	 * 移除全部clip
+	 */
+	removeAllClips(){
+		let length = this.clips.length;
+		for(let i = 0;i<length;i++){
+			let clip = this.clips[i];
+			clip.$status = 0;//重置初始状态
+			clip.$parent.$el.style.setProperty(clip.style, clip.$initValue, 'important');//恢复初始属性值
+			clip.$initValue = null;//重置初始属性值
+			clip.$parent = null;//重置父对象
+		}
+		this.clips = [];
 		return this;
 	}
 

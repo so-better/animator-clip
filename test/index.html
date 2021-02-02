@@ -43,7 +43,7 @@
 			value:0,
 			speed:-0.005
 		})
-		animator.addClip(clip2);
+		animator.addClip(clip);
 		//clip.chain(clip2);
 		
 		clip.on('start',()=>{
@@ -65,7 +65,8 @@
 			animator.start();
 		}
 		function stop(){
-			animator.stop();
+			//animator.stop();
+			animator.removeAllClips()
 		}
 		function reset(){
 			animator.reset();

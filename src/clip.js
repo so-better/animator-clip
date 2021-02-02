@@ -92,15 +92,15 @@ class Clip {
 		let oldValue = parseFloat(this._getCssStyle(this.style));
 		//如果属性为渐增的且属性值已经超过目标属性值大小，则不进行动画
 		if (this.speed > 0 && oldValue >= this.value) {
-			return;
+			return this;
 		}
 		//如果属性为渐少的且属性值已经达到目标属性值大小，则不进行动画
 		if (this.speed < 0 && oldValue <= this.value) {
-			return;
+			return this;
 		}
 		//如果已经是进行状态或者完成状态，则不进行动画
 		if (this.$status == 1 || this.$status == 3) {
-			return;
+			return this;
 		}
 		//更改帧状态
 		this.$status = 1;
@@ -168,7 +168,7 @@ class Clip {
 		}
 		//非运行状态的动画帧无法停止
 		if (this.$status != 1) {
-			return;
+			return this;
 		}
 		//修改状态
 		this.$status = 2;
@@ -192,7 +192,7 @@ class Clip {
 		}
 		//初始状态的动画帧无需重置
 		if (this.$status == 0) {
-			return;
+			return this;
 		}
 		//修改状态
 		this.$status = 0;
