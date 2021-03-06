@@ -108,12 +108,8 @@ class Clip {
 		this.$status = 1;
 		//clip触发start事件
 		this._emit('start');
-		//animator触发start事件
-		//当第一个动画执行时就触发，且执行多个动画时只触发一次
-		if(!this.$parent.$triggerStart){
-			this.$parent.$options.start.call(this.$parent);
-			this.$parent.$triggerStart = true;
-		}
+		//animator触发start事件,clip作为参数
+		this.$parent.$options.start.call(this.$parent,this,this.$parent.$el);
 		//动画帧执行函数
 		let doFun = () => {
 			//每一帧运行时判断是否处在运行状态
@@ -140,7 +136,7 @@ class Clip {
 			//clip触发update事件
 			this._emit('update', [this.style, newValue])
 			//animator触发update事件
-			this.$parent.$options.update.apply(this.$parent, [this, this.style, newValue])
+			this.$parent.$options.update.call(this.$parent, this, this.$parent.$el, this.style, newValue)
 			if (this.speed > 0 && newValue < this.value) {
 				this.$requestAnimationFrame.call(window, doFun)
 			} else if (this.speed < 0 && newValue > this.value) {
@@ -150,19 +146,17 @@ class Clip {
 				this.$status = 3;
 				//clip触发complete事件
 				this._emit('complete');
+				//animator触发complete事件
+				this.$parent.$options.complete.call(this.$parent,this,this.$parent.$el);
 				//调用clip自身的chain型clip
 				if(this.$chainClip){
 					this.$parent.addClip(this.$chainClip);
 					this.$chainClip.start();
 				}
-				//动画全部结束
-				if (this.$parent.getCompleteClips().length == this.$parent.clips.length) {
-					//animator触发complete事件
-					this.$parent.$options.complete.call(this.$parent)
-				}
 			}
 		}
 		this.$requestAnimationFrame.call(window, doFun);
+		//返回clip实例
 		return this;
 	}
 
@@ -179,14 +173,11 @@ class Clip {
 		}
 		//修改状态
 		this.$status = 2;
-		this.$parent.$triggerStart = false;
 		//clip触发stop事件
 		this._emit('stop')
 		//animator触发stop事件
-		//停止的clip数量+完成的clip数量=所有的clip数量
-		if(this.$parent.getStopClips().length + this.$parent.getCompleteClips().length == this.$parent.clips.length){
-			this.$parent.$options.stop.call(this.$parent);
-		}
+		this.$parent.$options.stop.call(this.$parent,this,this.$parent.$el);
+		//返回clip实例
 		return this;
 	}
 
@@ -203,16 +194,13 @@ class Clip {
 		}
 		//修改状态
 		this.$status = 0;
-		this.$parent.$triggerStart = false;
 		//恢复初始属性值
 		this.$parent.$el.style.setProperty(this.style, this.$initValue, 'important');
 		//触发clip的reset事件
 		this._emit('reset')
 		//animator触发reset事件
-		//全部clip变为初始状态
-		if(this.$parent.getCompleteClips().length == 0 && this.$parent.getStopClips().length == 0 && this.$parent.getClips().length == 0){
-			this.$parent.$options.reset.call(this.$parent)	
-		}
+		this.$parent.$options.reset.call(this.$parent,this,this.$parent.$el);
+		//返回clip实例
 		return this;
 	}
 
@@ -231,6 +219,7 @@ class Clip {
 		}
 		this.$chainClip = clip;
 		this.$chainClip.$type = 1;
+		//返回chain的clip
 		return clip;
 	}
 

@@ -4,7 +4,6 @@ class Animator {
 		this.$el = el;
 		this.$options = options;
 		this.clips = [];
-		this.$triggerStart = false;
 		this._init();
 	}
 
@@ -48,10 +47,18 @@ class Animator {
 	 * 将clip添加到队列
 	 */
 	addClip(clip){
+		if(!clip){
+			throw new TypeError('clip is not defined')
+		}
 		if(!(clip instanceof Clip)){
 			throw new TypeError('clip is not a Clip instance')
 		}
-		if(clip.$parent){
+		//clip存在于其他animator中
+		if(this.clips.lastIndexOf(clip) < 0 && clip.$parent){
+			throw new Error('the clip has already been added to other Animator instances')
+		}
+		//clip已经在animator中了
+		if(this.clips.lastIndexOf(clip) > -1){
 			return this;
 		}
 		this.clips.push(clip);
@@ -66,11 +73,20 @@ class Animator {
 	 * 将clip移出队列
 	 */
 	removeClip(clip){
+		if(!clip){
+			throw new TypeError('clip is not defined')
+		}
 		if(!(clip instanceof Clip)){
 			throw new TypeError('clip is not a Clip instance')
 		}
-		if(!clip.$parent){
-			return this;
+		//clip不存在于此animator中
+		if(this.clips.lastIndexOf(clip) < 0){
+			//存在于其他animator中
+			if(clip.$parent){
+				throw new Error('the clip does not belong to this Animator instance')
+			}
+			//没有添加到任何一个animator中
+			throw new Error('the clip has not been added to the Animator instance')
 		}
 		let index = -1;
 		let length = this.clips.length;

@@ -17,20 +17,20 @@
 		const {Animator,Clip} = AnimatorClip;
 		var scale = 1;
 		var animator = new Animator ('#el',{
-			start(){
-				console.log('animator start')
+			start(clip,el){
+				//console.log(clip,el)
 			},
-			stop(){
-				console.log('animator stop')
+			stop(clip,el){
+				//console.log(el)
 			},
-			reset(){
-				console.log('animator reset')
+			reset(clip,el){
+				//console.log(clip)
 			},
-			complete(){
-				console.log('animator complete')
+			complete(clip,el){
+				console.log(clip)
 			},
-			update(clip,style,value){
-				
+			update(clip,el,style,value){
+				//console.log(style,value)
 			}
 		})
 		var clip = new Clip({
@@ -49,46 +49,8 @@
 			speed:5
 		})
 		animator.addClip(clip);
-		clip.chain(clip3).chain(clip2);
+		clip.chain(clip3).chain(clip2)
 		
-		clip.on('start',()=>{
-			console.log('clip start')
-		})
-		clip.on('stop',()=>{
-			console.log('clip stop')
-		})
-		clip.on('reset',()=>{
-			console.log('clip reset')
-		})
-		clip.on('complete',()=>{
-			console.log('clip complete')
-		})
-		
-		clip2.on('start',()=>{
-			console.log('clip2 start')
-		})
-		clip2.on('stop',()=>{
-			console.log('clip2 stop')
-		})
-		clip2.on('reset',()=>{
-			console.log('clip2 reset')
-		})
-		clip2.on('complete',()=>{
-			console.log('clip2 complete')
-		})
-		
-		clip3.on('start',()=>{
-			console.log('clip3 start')
-		})
-		clip3.on('stop',()=>{
-			console.log('clip3 stop')
-		})
-		clip3.on('reset',()=>{
-			console.log('clip3 reset')
-		})
-		clip3.on('complete',()=>{
-			console.log('clip3 complete')
-		})
 		
 		function start(){
 			animator.start();
