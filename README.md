@@ -33,7 +33,7 @@ var animator = new Animator(el,options);
 var clip = new Clip(options)
 //options参数表示该clip的配置，主要包含style、value、speed三个参数
 //style：产生变化的css属性名称，如："height"、"width"、"top"、"left"等
-//value：动画目标值，需要带上单位，如果是没有单位的值，则直接写数值，如style为"opacity"时，值可以直接设置数字，如果是px、rem单位的值，则需要带上该单位
+//value：动画目标值，需要带上单位，如果是没有单位的值，则直接写数值，如style为"opacity"时，值可以直接设置数字，如果是px单位的值，则需要带上该单位
 //speed：动画速度，只能填写数字，如果value的值是px单位的值，speed表示的也是px单位的数值，以此类推
 ```
 
