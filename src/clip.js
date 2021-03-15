@@ -1,22 +1,22 @@
 /**
  * 单一属性动画类
+ * @param {Object} options
  */
 class Clip {
 	constructor(options) {
-		if (typeof options != 'object' || !options) {
-			options = {}
-		}
-		this.style = options.style; //样式名称
-		this.value = options.value; //样式最终值
-		this.speed = options.speed; //动画速度，即每次样式改变的量
+		this.$options = options;//配置参数
+		this.style = null; //样式名称
+		this.value = null; //样式最终值
+		this.speed = null; //动画速度，即每次样式改变的量
 		this.$unit = null; //样式单位，无单位则为null
-		this.$requestAnimationFrame = null;
+		this.$requestAnimationFrame = null;//动画api
 		this.$status = 0; //0表示动画初始状态，1表示动画进行状态，2表示动画停止状态，3表示动画完成状态
-		this.$parent = null; //animator实例
-		this.$initValue = null; //属性值初始值
 		this.$events = []; //自定义事件数组
 		this.$chainClip = null;//连续调用的动画
 		this.$type = 0,//0表示普通clip，1表示chain型clip
+		this.id = null;//id
+		this.$initValue = null; //属性值初始值
+		this.$parent = null; //animator实例
 		this._init();
 	}
 
@@ -24,35 +24,48 @@ class Clip {
 	 * 初始化参数
 	 */
 	_init() {
-		//参数初始化
-		if (typeof this.style != 'string' || !this.style) {
-			throw new Error('style is not defined')
+		//options
+		if (typeof this.$options != 'object' || !this.$options) {
+			throw new Error('the options constructor parameter for clip should be an object')
 		}
-		if (typeof this.value == 'number') {
-			this.$unit = null;
-		} else if (typeof this.value == 'string') {
-			if (this.value.endsWith('px')) {
+		
+		//style
+		if(!this.$options.style){
+			throw new Error('style is not defined');
+		}
+		if(typeof this.$options.style != 'string'){
+			throw new TypeError('style should be a string value')
+		}
+		this.style = this.$options.style;
+		
+		//value
+		if(typeof this.$options.value == 'number'){
+			this.value = this.$options.value;
+		}else if(typeof this.$options.value == 'string' && this.$options.value){
+			if(this.$options.value.endsWith('px')){
+				this.value = parseFloat(this.$options.value);
 				this.$unit = 'px';
-			} else {
+			}else {
 				throw new Error('currently, only attribute values for px units are supported')
 			}
-			this.value = parseFloat(this.value);
-		} else {
-			if (!this.value) {
-				throw new Error('value is not defined')
-			} else {
+		}else {
+			if(!this.$options.value){
+				throw new Error('value is not defined');
+			}else {
 				throw new TypeError('value is should be a number or a string')
 			}
 		}
-		if (typeof this.speed != 'number') {
-			this.speed = 0;
+		
+		//speed
+		if (typeof this.$options.speed == 'number') {
+			this.speed = this.$options.speed;
+		}else {
+			throw new TypeError('speed is should be a number')
 		}
+		
 		//动画函数初始化
-		this.$requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;
-		if (!this.$requestAnimationFrame) {
-			throw new ReferenceError('browser does not support requestAnimationFrame');
-		}
-
+		this.$requestAnimationFrame = this._getRequestAnimationFrame();
+		
 		//事件数组初始化
 		this.$events = [
 			//动画开始事件
@@ -117,20 +130,19 @@ class Clip {
 				return;
 			}
 			//每一帧运行时判断是否达到目标属性值
-			let initValue = parseFloat(this._getCssStyle(this.style));
-			if (this.speed > 0 && initValue >= this.value) {
+			let currentValue = parseFloat(this._getCssStyle(this.style));
+			if (this.speed > 0 && currentValue >= this.value) {
 				return;
 			}
-			if (this.speed < 0 && initValue <= this.value) {
+			if (this.speed < 0 && currentValue <= this.value) {
 				return;
 			}
 			//设置样式
 			if(this.$unit){
-				this.$parent.$el.style.setProperty(this.style, (initValue + this.speed) + this.$unit, 'important');
+				this.$parent.$el.style[this.style] = (currentValue + this.speed) + this.$unit;
 			}else{
-				this.$parent.$el.style.setProperty(this.style, initValue + this.speed, 'important');
+				this.$parent.$el.style[this.style] = currentValue + this.speed;
 			}
-			
 			//获取新的属性值
 			let newValue = parseFloat(this._getCssStyle(this.style));
 			//clip触发update事件
@@ -195,9 +207,9 @@ class Clip {
 		//修改状态
 		this.$status = 0;
 		//恢复初始属性值
-		this.$parent.$el.style.setProperty(this.style, this.$initValue, 'important');
+		this.$parent.$el.style[this.style] = this.$initValue;
 		//触发clip的reset事件
-		this._emit('reset')
+		this._emit('reset');
 		//animator触发reset事件
 		this.$parent.$options.reset.call(this.$parent,this,this.$parent.$el);
 		//返回clip实例
@@ -206,6 +218,7 @@ class Clip {
 
 	/**
 	 * 连续执行动画
+	 * @param {Object} clip
 	 */
 	chain(clip){
 		if(!clip){
@@ -215,16 +228,18 @@ class Clip {
 			throw new TypeError('clip is not a Clip instance')
 		}
 		if (clip.$parent) {
-			throw new ReferenceError('clip shoud not be added to the Animator instance')
+			throw new ReferenceError('clip has already been added to other Animator instance')
 		}
+		clip.$type = 1;
 		this.$chainClip = clip;
-		this.$chainClip.$type = 1;
 		//返回chain的clip
 		return clip;
 	}
 
 	/**
 	 * 自定义事件执行
+	 * @param {Object} eventName
+	 * @param {Object} handler
 	 */
 	on(eventName, handler) {
 		let event = this._getEvent(eventName);
@@ -237,7 +252,27 @@ class Clip {
 	}
 
 	/**
+	 * requestAnimationFrame兼容性封装
+	 */
+	_getRequestAnimationFrame(){
+		let animation = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;
+		//如果不兼容，则手动封装一个
+		if(!animation){
+			let lastTime = 0;
+			animation = function(callback){
+				let currTime = Date.now();
+				let timeToCall = Math.max(0, 1000/60 - (currTime - lastTime));
+				window.setTimeout(callback, timeToCall)
+				lastTime = currTime + timeToCall;
+			}
+		}
+		return animation;
+	}
+
+	/**
 	 * 触发自定义事件
+	 * @param {Object} eventName
+	 * @param {Object} params
 	 */
 	_emit(eventName, params) {
 		let event = this._getEvent(eventName);
@@ -252,6 +287,7 @@ class Clip {
 
 	/**
 	 * 获取事件数组中指定事件
+	 * @param {Object} eventName
 	 */
 	_getEvent(eventName) {
 		let event = null;
@@ -267,12 +303,13 @@ class Clip {
 
 	/**
 	 * 获取元素指定样式
-	 * cssName:样式名称,css名称
+	 * @param {Object} cssName
 	 */
 	_getCssStyle(cssName) {
 		if (typeof cssName == "string") {
 			let cssText = "";
-			if (document.defaultView && document.defaultView.getComputedStyle) { //兼容IE9-IE11、chrome、firefox、safari、opera；不兼容IE7-IE8
+			//兼容IE9-IE11、chrome、firefox、safari、opera；不兼容IE7-IE8
+			if (document.defaultView && document.defaultView.getComputedStyle) { 
 				cssText = document.defaultView.getComputedStyle(this.$parent.$el)[cssName];
 			} else { //兼容IE7-IE11；不兼容chrome、firefox、safari、opera
 				cssText = this.$parent.$el.currentStyle[cssName];
