@@ -4,19 +4,35 @@
  */
 class Clip {
 	constructor(options) {
-		this.$options = options;//配置参数
-		this.style = null; //样式名称
-		this.value = null; //样式最终值
-		this.speed = null; //动画速度，即每次样式改变的量
-		this.$unit = null; //样式单位，无单位则为null
-		this.$requestAnimationFrame = null;//动画api
-		this.$status = 0; //0表示动画初始状态，1表示动画进行状态，2表示动画停止状态，3表示动画完成状态
-		this.$events = []; //自定义事件数组
-		this.$chainClip = null;//连续调用的动画
-		this.$type = 0,//0表示普通clip，1表示chain型clip
-		this.id = null;//id
-		this.$initValue = null; //属性值初始值
-		this.$parent = null; //animator实例
+		//唯一标志
+		this.id = null;
+		//样式名称
+		this.style = null;
+		//样式最终值
+		this.value = null;
+		//动画速度，即每次样式改变的量
+		this.speed = null;
+		//是否自由模式
+		this.free = false;
+		//配置参数
+		this.$options = options;
+		//样式单位，无单位则为null
+		this.$unit = null;
+		//动画api
+		this.$requestAnimationFrame = null;
+		//0表示动画初始状态，1表示动画进行状态，2表示动画停止状态，3表示动画完成状态
+		this.$status = 0;
+		//自定义事件数组
+		this.$events = [];
+		//连续调用的动画
+		this.$chainClip = null;
+		//0表示普通clip，1表示chain型clip
+		this.$type = 0;
+		//属性值初始值
+		this.$initValue = null;
+		//animator实例
+		this.$parent = null;
+		//执行初始化方法
 		this._init();
 	}
 
@@ -25,44 +41,56 @@ class Clip {
 	 */
 	_init() {
 		//options
-		if (typeof this.$options != 'object' || !this.$options) {
+		if(!this.$options){//options参数不存在的情况下默认为自由模式
+			this.free = true;
+			this.$options = null;
+		}else if (typeof this.$options == 'object') {//options参数为对象
+			//free
+			if(typeof this.$options.free == 'boolean'){
+				this.free = this.$options.free;
+			}else {
+				this.free = false;
+			}
+			
+			//非free模式对其他参数进行验证
+			if(!this.free){
+				//style
+				if(typeof this.$options.style == 'string' && this.$options.style){
+					this.style = this.$options.style;
+				}else {
+					throw new TypeError('style should be a string')
+				}
+				
+				//value
+				if(typeof this.$options.value == 'number'){//如果是数值，则无单位
+					this.value = this.$options.value;
+					this.$unit = null;
+				}else if(typeof this.$options.value == 'string' && this.$options.value){
+					this.value = parseFloat(this.$options.value);//记录值
+					if(this.$options.value.endsWith('px')){//如果是px单位的值
+						this.$unit = 'px';//记录单位
+					}else if(this.$options.value.endsWith('rem')){//如果是rem单位的值
+						this.$unit = 'rem';//记录单位
+					}else if(this.$options.value.endsWith('em')){//如果是em单位的值
+						this.$unit = 'em';//记录单位
+					}else {
+						throw new Error('currently, only attribute values for PX and REM and EM units are supported')
+					}
+				}else {
+					throw new TypeError('value should be a number or a string')
+				}
+				
+				//speed
+				if (typeof this.$options.speed == 'number') {
+					this.speed = this.$options.speed;
+				}else {
+					throw new TypeError('speed should be a number')
+				}
+			}
+		}else {//options存在必须为对象，否则报错
 			throw new Error('the options constructor parameter for clip should be an object')
 		}
-		
-		//style
-		if(!this.$options.style){
-			throw new Error('style is not defined');
-		}
-		if(typeof this.$options.style != 'string'){
-			throw new TypeError('style should be a string value')
-		}
-		this.style = this.$options.style;
-		
-		//value
-		if(typeof this.$options.value == 'number'){
-			this.value = this.$options.value;
-		}else if(typeof this.$options.value == 'string' && this.$options.value){
-			if(this.$options.value.endsWith('px')){
-				this.value = parseFloat(this.$options.value);
-				this.$unit = 'px';
-			}else {
-				throw new Error('currently, only attribute values for px units are supported')
-			}
-		}else {
-			if(!this.$options.value){
-				throw new Error('value is not defined');
-			}else {
-				throw new TypeError('value is should be a number or a string')
-			}
-		}
-		
-		//speed
-		if (typeof this.$options.speed == 'number') {
-			this.speed = this.$options.speed;
-		}else {
-			throw new TypeError('speed is should be a number')
-		}
-		
+	
 		//动画函数初始化
 		this.$requestAnimationFrame = this._getRequestAnimationFrame();
 		
@@ -103,15 +131,18 @@ class Clip {
 		if (!this.$parent || !this.$parent.$el) {
 			throw new ReferenceError('clip shoud be added to the Animator instance')
 		}
-		//获取初始属性值
-		let oldValue = parseFloat(this._getCssStyle(this.style));
-		//如果属性为渐增的且属性值已经超过目标属性值大小，则不进行动画
-		if (this.speed > 0 && oldValue >= this.value) {
-			return this;
-		}
-		//如果属性为渐少的且属性值已经达到目标属性值大小，则不进行动画
-		if (this.speed < 0 && oldValue <= this.value) {
-			return this;
+		//非free模式下进行属性值判断
+		if(!this.free){
+			//获取初始属性值
+			let oldValue = this._getUnitCssValue();
+			//如果属性为渐增的且属性值已经超过目标属性值大小，则不进行动画
+			if (this.speed > 0 && oldValue >= this.value) {
+				return this;
+			}
+			//如果属性为渐少的且属性值已经达到目标属性值大小，则不进行动画
+			if (this.speed < 0 && oldValue <= this.value) {
+				return this;
+			}
 		}
 		//如果已经是进行状态或者完成状态，则不进行动画
 		if (this.$status == 1 || this.$status == 3) {
@@ -129,43 +160,53 @@ class Clip {
 			if (this.$status != 1) {
 				return;
 			}
-			//每一帧运行时判断是否达到目标属性值
-			let currentValue = parseFloat(this._getCssStyle(this.style));
-			if (this.speed > 0 && currentValue >= this.value) {
-				return;
-			}
-			if (this.speed < 0 && currentValue <= this.value) {
-				return;
-			}
-			//设置样式
-			if(this.$unit){
-				this.$parent.$el.style[this.style] = (currentValue + this.speed) + this.$unit;
-			}else{
-				this.$parent.$el.style[this.style] = currentValue + this.speed;
-			}
-			//获取新的属性值
-			let newValue = parseFloat(this._getCssStyle(this.style));
-			//clip触发update事件
-			this._emit('update', [this.style, newValue])
-			//animator触发update事件
-			this.$parent.$options.update.call(this.$parent, this, this.$parent.$el, this.style, newValue)
-			if (this.speed > 0 && newValue < this.value) {
+			//free模式下
+			if(this.free){
+				//clip触发update事件
+				this._emit('update');
+				//animator触发update事件
+				this.$parent.$options.update.call(this.$parent, this, this.$parent.$el);
+				//递归调用动画
 				this.$requestAnimationFrame.call(window, doFun)
-			} else if (this.speed < 0 && newValue > this.value) {
-				this.$requestAnimationFrame.call(window, doFun)
-			} else {
-				//动画运行结束，修改状态
-				this.$status = 3;
-				//clip触发complete事件
-				this._emit('complete');
-				//animator触发complete事件
-				this.$parent.$options.complete.call(this.$parent,this,this.$parent.$el);
-				//调用clip自身的chain型clip
-				if(this.$chainClip){
-					this.$parent.addClip(this.$chainClip);
-					this.$chainClip.start();
+			}else {//非free模式下
+				//获取当前属性值
+				let currentValue = this._getUnitCssValue();
+				//获取新的属性值
+				let newValue = currentValue + this.speed;
+				//给元素设置新属性值样式
+				if(this.$unit){
+					this.$parent.$el.style[this.style] = newValue + this.$unit;
+				}else{
+					this.$parent.$el.style[this.style] = newValue;
+				}
+				//clip触发update事件
+				this._emit('update', [this.style, newValue])
+				//animator触发update事件
+				this.$parent.$options.update.call(this.$parent, this, this.$parent.$el, this.style, newValue)
+				//达到目标值完成动画
+				if((this.speed > 0 && newValue >= this.value) || (this.speed < 0 && newValue <= this.value)){
+					//设置样式值为目标值
+					if(this.$unit){
+						this.$parent.$el.style[this.style] = this.value + this.$unit;
+					}else{
+						this.$parent.$el.style[this.style] = this.value;
+					}
+					//动画运行结束，修改状态
+					this.$status = 3;
+					//调用clip自身的chain型clip
+					if(this.$chainClip){
+						this.$parent.addClip(this.$chainClip);
+						this.$chainClip.start();
+					}
+					//clip触发complete事件
+					this._emit('complete');
+					//animator触发complete事件
+					this.$parent.$options.complete.call(this.$parent,this,this.$parent.$el);
+				}else {//没有达到目标值则继续进行动画
+					this.$requestAnimationFrame.call(window, doFun)
 				}
 			}
+			
 		}
 		this.$requestAnimationFrame.call(window, doFun);
 		//返回clip实例
@@ -206,8 +247,10 @@ class Clip {
 		}
 		//修改状态
 		this.$status = 0;
-		//恢复初始属性值
-		this.$parent.$el.style[this.style] = this.$initValue;
+		//非free模式下恢复初始属性值
+		if(!this.free){
+			this.$parent.$el.style[this.style] = this.$initValue;
+		}
 		//触发clip的reset事件
 		this._emit('reset');
 		//animator触发reset事件
@@ -234,6 +277,25 @@ class Clip {
 		this.$chainClip = clip;
 		//返回chain的clip
 		return clip;
+	}
+
+	/**
+	 * 主动触发完成事件
+	 */
+	emitComplete(){
+		if(this.free){
+			//动画运行结束，修改状态
+			this.$status = 3;
+			//调用clip自身的chain型clip
+			if(this.$chainClip){
+				this.$parent.addClip(this.$chainClip);
+				this.$chainClip.start();
+			}
+			//clip触发complete事件
+			this._emit('complete');
+			//animator触发complete事件
+			this.$parent.$options.complete.call(this.$parent,this,this.$parent.$el);
+		}
 	}
 
 	/**
@@ -302,22 +364,83 @@ class Clip {
 	}
 
 	/**
-	 * 获取元素指定样式
+	 * 获取元素基于单位$unit的值
+	 */
+	_getUnitCssValue(){
+		//获取px单位的值
+		let value = parseFloat(this._getCssStyle(this.$parent.$el,this.style));
+		//如果$unit为rem
+		if(this.$unit == 'rem'){
+			return this._px2rem(value);
+		}else if(this.$unit == 'em'){
+			return this._px2em(this.$parent.$el,value);
+		}
+		//px单位或者无单位直接返回value
+		return value;
+	}
+
+	/**
+	 * 获取元素指定样式值
+	 * @param {Object} el
 	 * @param {Object} cssName
 	 */
-	_getCssStyle(cssName) {
+	_getCssStyle(el,cssName) {
 		if (typeof cssName == "string") {
 			let cssText = "";
 			//兼容IE9-IE11、chrome、firefox、safari、opera；不兼容IE7-IE8
 			if (document.defaultView && document.defaultView.getComputedStyle) { 
-				cssText = document.defaultView.getComputedStyle(this.$parent.$el)[cssName];
+				cssText = document.defaultView.getComputedStyle(el)[cssName];
 			} else { //兼容IE7-IE11；不兼容chrome、firefox、safari、opera
-				cssText = this.$parent.$el.currentStyle[cssName];
+				cssText = el.currentStyle[cssName];
 			}
 			return cssText;
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * rem转为px
+	 * @param {Object} number
+	 */
+	_rem2px(number) {
+		let fs = this._getCssStyle(document.documentElement, "font-size");
+		let num = number * parseFloat(fs); //获得px单位的值
+		return num;
+	}
+	
+	/**
+	 * px转为rem
+	 * @param {Object} number
+	 */
+	_px2rem(number) {
+		let fs = this._getCssStyle(document.documentElement, "font-size");
+		let num = number / parseFloat(fs);//获得rem单位的值
+		return num;
+	}
+	
+	/**
+	 * px转为em
+	 * @param {Object} el
+	 * @param {Object} number
+	 */
+	_px2em(el,number){
+		let parentNode = el.parentNode || el.parentElement;
+		let fs = this._getCssStyle(parentNode, "font-size");
+		let num = number / parseFloat(fs);//获得em单位的值
+		return num;
+	}
+	
+	/**
+	 * em转为px
+	 * @param {Object} el
+	 * @param {Object} number
+	 */
+	_em2px(el,number){
+		let parentNode = el.parentNode || el.parentElement;
+		let fs = this._getCssStyle(parentNode, "font-size");
+		let num = number * parseFloat(fs); //获得px单位的值
+		return num;
 	}
 }
 

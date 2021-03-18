@@ -78,8 +78,14 @@ class Animator {
 		}
 		//设置父对象
 		clip.$parent = this;
-		//记录初始值
-		clip.$initValue = clip._getCssStyle(clip.style);
+		//非free模式下需要记录初始值
+		if(!clip.free){
+			if(clip.$unit){
+				clip.$initValue = clip._getUnitCssValue() + clip.$unit;
+			}else {
+				clip.$initValue = clip._getUnitCssValue();
+			}
+		}
 		//将clip加入到clips中去
 		this.clips.push(clip);
 		
@@ -113,11 +119,14 @@ class Animator {
 			throw new Error('the clip does not belong to this Animator instance')
 		}
 		//重置初始状态
-		clip.$status = 0; 
-		//恢复元素的初始样式
-		clip.$parent.$el.style[clip.style] = clip.$initValue;
-		//重置初始属性值
-		clip.$initValue = null; 
+		clip.$status = 0;
+		//非free模式下处理
+		if(!clip.free){
+			//恢复元素的初始样式
+			clip.$parent.$el.style[clip.style] = clip.$initValue;
+			//重置初始属性值
+			clip.$initValue = null; 
+		}
 		//重置父对象
 		clip.$parent = null; 
 		//重置id
@@ -135,16 +144,7 @@ class Animator {
 		let length = this.clips.length;
 		for (let i = 0; i < length; i++) {
 			let clip = this.clips[i];
-			//重置id
-			clip.id = null;
-			//重置初始状态
-			clip.$status = 0; 
-			//恢复元素的初始样式
-			clip.$parent.$el.style[clip.style] = clip.$initValue; 
-			//重置初始属性值
-			clip.$initValue = null; 
-			//重置父对象
-			clip.$parent = null; 
+			this.removeClip(clip)
 		}
 		//清空数组
 		this.clips = [];

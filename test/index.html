@@ -4,63 +4,54 @@
 		<meta charset="utf-8">
 		<title>animator</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
-		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
+		<!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
 		<script>
 			new VConsole();
-		</script>
+		</script> -->
 	</head>
 	<body style="overflow: hidden;">
 		<button type="button" onclick="reset()">重置</button>
 		<button type="button" onclick="start()">开始</button>
 		<button type="button" onclick="stop()">停止</button>
 		<button type="button" onclick="getClips()">获取正在运行的clips</button>
-		<div style="width: 60px;height: 100px;background-color: #FF0000;position: absolute;left: 100px;top: 100px;" id="el"></div>
+		<div style="width: 60px;height: 100px;background-color: #FF0000;position: absolute;left: 5rem;top: 5rem;" id="el"></div>
 	</body>
 	<script src="../dist/animator-clip.js" type="text/javascript" charset="utf-8"></script>
 	<script>
 		const {Animator,Clip} = AnimatorClip;
+		var animator = new Animator ('#el');
+		var clip = new Clip()
+		animator.addClip(clip);
 		var scale = 1;
-		var animator = new Animator ('#el',{
-			start(clip,el){
-				//console.log('----------------start------------------')
-				//console.log(clip,el)
-			},
-			stop(clip,el){
-				//console.log('----------------stop------------------')
-				//console.log(clip,el)
-			},
-			reset(clip,el){
-				//console.log('----------------reset------------------')
-				//console.log(clip,el)
-			},
-			complete(clip,el){
-				//console.log('----------------complete------------------')
-				//console.log(clip,el)
-			},
-			update(clip,el,style,value){
-				//console.log(clip.speed)
+		clip.on('update',function(el){
+			if(scale >= 0.2){
+				scale -= 0.01;
+				el.style.transform = 'scale('+scale+')'
+			}else {
+				this.emitComplete();
 			}
 		})
-		var clip = new Clip({
-			style:'top',
-			value:'400px',
-			speed:4
+		clip.on('start',function(el){
+			console.log('clip开始')
+		})
+		clip.on('complete',function(el){
+			console.log('clip完成')
+		})
+		clip.on('stop',function(el){
+			console.log('clip停止')
+		})
+		clip.on('reset',function(el){
+			console.log('clip重置')
+			scale = 1;
+			el.style.transform = 'scale('+scale+')'
 		})
 		var clip2 = new Clip({
 			style:'left',
-			value:'200px',
-			speed:4
+			value:'20rem',
+			speed:0.5
 		})
-		//clip.chain(clip2)
-		animator.addClip(clip).addClip(clip2);
-		
-		clip.on('update',(el,style,value)=>{
-			//console.log(style,value)
-		})
-		clip2.on('update',(el,style,value)=>{
-			//console.log(style,value)
-		})
-		
+		clip.chain(clip2)
+		console.log(clip)
 		function start(){
 			animator.start();
 		}
