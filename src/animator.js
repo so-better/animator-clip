@@ -103,7 +103,7 @@ class Animator {
 		if (!(clip instanceof Clip)) {
 			throw new TypeError('clip is not a Clip instance')
 		}
-		if(!clip.$parent || !clip.id){
+		if(!clip.$parent || typeof clip.id != 'number' || isNaN(clip.id)){
 			throw new Error('the clip has not been added to Animator instance')
 		}
 		let index = -1;
