@@ -215,7 +215,7 @@ class Animator {
 	 * 重置动画
 	 */
 	reset() {
-		var chainClips = [];
+		let chainClips = [];
 		this.clips.forEach(clip => {
 			clip.reset();
 			//如果是chain型clip则记录到数组内
