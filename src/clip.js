@@ -175,9 +175,9 @@ class Clip {
 				let newValue = currentValue + this.speed;
 				//给元素设置新属性值样式
 				if(this.$unit){
-					this.$parent.$el.style[this.style] = newValue + this.$unit;
+					this.$parent.$el.style.setProperty(this.style,newValue + this.$unit,'important')
 				}else{
-					this.$parent.$el.style[this.style] = newValue;
+					this.$parent.$el.style.setProperty(this.style,newValue,'important')
 				}
 				//clip触发update事件
 				this._emit('update', [this.style, newValue])
@@ -187,21 +187,21 @@ class Clip {
 				if((this.speed > 0 && newValue >= this.value) || (this.speed < 0 && newValue <= this.value)){
 					//设置样式值为目标值
 					if(this.$unit){
-						this.$parent.$el.style[this.style] = this.value + this.$unit;
+						this.$parent.$el.style.setProperty(this.style,this.value + this.$unit,'important')
 					}else{
-						this.$parent.$el.style[this.style] = this.value;
+						this.$parent.$el.style.setProperty(this.style,this.value,'important')
 					}
 					//动画运行结束，修改状态
 					this.$status = 3;
+					//clip触发complete事件
+					this._emit('complete');
+					//animator触发complete事件
+					this.$parent.$options.complete.call(this.$parent,this,this.$parent.$el);
 					//调用clip自身的chain型clip
 					if(this.$chainClip){
 						this.$parent.addClip(this.$chainClip);
 						this.$chainClip.start();
 					}
-					//clip触发complete事件
-					this._emit('complete');
-					//animator触发complete事件
-					this.$parent.$options.complete.call(this.$parent,this,this.$parent.$el);
 				}else {//没有达到目标值则继续进行动画
 					this.$requestAnimationFrame.call(window, doFun)
 				}
@@ -249,7 +249,7 @@ class Clip {
 		this.$status = 0;
 		//非free模式下恢复初始属性值
 		if(!this.free){
-			this.$parent.$el.style[this.style] = this.$initValue;
+			this.$parent.$el.style.setProperty(this.style,this.$initValue,'important')
 		}
 		//触发clip的reset事件
 		this._emit('reset');

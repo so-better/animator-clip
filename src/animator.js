@@ -123,7 +123,7 @@ class Animator {
 		//非free模式下处理
 		if(!clip.free){
 			//恢复元素的初始样式
-			clip.$parent.$el.style[clip.style] = clip.$initValue;
+			clip.$parent.$el.style.setProperty(clip.style,clip.$initValue,'important')
 			//重置初始属性值
 			clip.$initValue = null; 
 		}
@@ -141,14 +141,12 @@ class Animator {
 	 * 移除全部clip
 	 */
 	removeAllClips() {
-		let length = this.clips.length;
-		for (let i = 0; i < length; i++) {
-			let clip = this.clips[i];
+		let clips = [...this.clips]
+		clips.forEach(clip=>{
 			this.removeClip(clip)
-		}
+		})
 		//清空数组
 		this.clips = [];
-		
 		return this;
 	}
 
