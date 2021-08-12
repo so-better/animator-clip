@@ -14,6 +14,8 @@ class Clip {
 		this.speed = null;
 		//是否自由模式
 		this.free = false;
+		//动画每次更新间隔时间
+		this.interval = 0;
 		//配置参数
 		this.$options = options;
 		//样式单位，无单位则为null
@@ -32,6 +34,8 @@ class Clip {
 		this.$initValue = null;
 		//animator实例
 		this.$parent = null;
+		//每次动画帧执行时的时间戳记录
+		this.$timeStamp = 0;
 		//执行初始化方法
 		this._init();
 	}
@@ -106,6 +110,11 @@ class Clip {
 				name: 'complete',
 				handler: function() {}
 			},
+			//动画更新之前
+			{
+				name:'beforeUpdate',
+				handler:function(){}
+			},
 			//动画更新事件
 			{
 				name: 'update',
@@ -148,6 +157,10 @@ class Clip {
 		if (this.$status == 1 || this.$status == 3) {
 			return this;
 		}
+		//设置初始的时间戳
+		this.$timeStamp = Date.now();
+		//恢复初始间隔时间
+		this.interval = 0;
 		//更改帧状态
 		this.$status = 1;
 		//clip触发start事件
@@ -160,8 +173,18 @@ class Clip {
 			if (this.$status != 1) {
 				return;
 			}
+			//获取当前的时间戳
+			let now = Date.now();
+			//记录动画间隔时间毫秒数
+			this.interval = now - this.$timeStamp;
+			//更新记录的时间戳
+			this.$timeStamp = now;
 			//free模式下
 			if(this.free){
+				//clip触发beforeUpdate事件
+				this._emit('beforeUpdate');
+				//animator触发beforeUpdate事件
+				this.$parent.$options.beforeUpdate.call(this.$parent,this,this.$parent.$el);
 				//clip触发update事件
 				this._emit('update');
 				//animator触发update事件
@@ -171,8 +194,12 @@ class Clip {
 			}else {//非free模式下
 				//获取当前属性值
 				let currentValue = this._getUnitCssValue();
+				//clip触发beforeUpdate事件
+				this._emit('beforeUpdate',[this.style,currentValue]);
+				//animator触发beforeUpdate事件
+				this.$parent.$options.beforeUpdate.call(this.$parent, this, this.$parent.$el, this.style, currentValue);
 				//获取新的属性值
-				let newValue = currentValue + this.speed;
+				let newValue = Number((currentValue + this.speed).toFixed(2));
 				//给元素设置新属性值样式
 				if(this.$unit){
 					this.$parent.$el.style.setProperty(this.style,newValue + this.$unit,'important')
@@ -191,6 +218,10 @@ class Clip {
 					}else{
 						this.$parent.$el.style.setProperty(this.style,this.value,'important')
 					}
+					//恢复初始的时间戳
+					this.$timeStamp = 0;
+					//恢复初始间隔时间
+					this.interval = 0;
 					//动画运行结束，修改状态
 					this.$status = 3;
 					//clip触发complete事件
@@ -224,6 +255,10 @@ class Clip {
 		if (this.$status != 1) {
 			return this;
 		}
+		//恢复初始的时间戳
+		this.$timeStamp = 0;
+		//恢复初始间隔时间
+		this.interval = 0;
 		//修改状态
 		this.$status = 2;
 		//clip触发stop事件
@@ -245,6 +280,10 @@ class Clip {
 		if (this.$status == 0) {
 			return this;
 		}
+		//恢复初始的时间戳
+		this.$timeStamp = 0;
+		//恢复初始间隔时间
+		this.interval = 0;
 		//修改状态
 		this.$status = 0;
 		//非free模式下恢复初始属性值
@@ -283,19 +322,21 @@ class Clip {
 	 * 主动触发完成事件
 	 */
 	emitComplete(){
-		if(this.free){
-			//动画运行结束，修改状态
-			this.$status = 3;
-			//调用clip自身的chain型clip
-			if(this.$chainClip){
-				this.$parent.addClip(this.$chainClip);
-				this.$chainClip.start();
-			}
-			//clip触发complete事件
-			this._emit('complete');
-			//animator触发complete事件
-			this.$parent.$options.complete.call(this.$parent,this,this.$parent.$el);
+		//非free模式无效
+		if(!this.free){
+			return;
 		}
+		//动画运行结束，修改状态
+		this.$status = 3;
+		//调用clip自身的chain型clip
+		if(this.$chainClip){
+			this.$parent.addClip(this.$chainClip);
+			this.$chainClip.start();
+		}
+		//clip触发complete事件
+		this._emit('complete');
+		//animator触发complete事件
+		this.$parent.$options.complete.call(this.$parent,this,this.$parent.$el);
 	}
 
 	/**
@@ -405,7 +446,7 @@ class Clip {
 	 */
 	_rem2px(number) {
 		let fs = this._getCssStyle(document.documentElement, "font-size");
-		let num = number * parseFloat(fs); //获得px单位的值
+		let num = Number((number * parseFloat(fs)).toFixed(2)); //获得px单位的值
 		return num;
 	}
 	
@@ -415,7 +456,7 @@ class Clip {
 	 */
 	_px2rem(number) {
 		let fs = this._getCssStyle(document.documentElement, "font-size");
-		let num = number / parseFloat(fs);//获得rem单位的值
+		let num = Number((number / parseFloat(fs)).toFixed(2));//获得rem单位的值
 		return num;
 	}
 	
@@ -427,7 +468,7 @@ class Clip {
 	_px2em(el,number){
 		let parentNode = el.parentNode || el.parentElement;
 		let fs = this._getCssStyle(parentNode, "font-size");
-		let num = number / parseFloat(fs);//获得em单位的值
+		let num = Number((number / parseFloat(fs)).toFixed(2));//获得em单位的值
 		return num;
 	}
 	
@@ -439,7 +480,7 @@ class Clip {
 	_em2px(el,number){
 		let parentNode = el.parentNode || el.parentElement;
 		let fs = this._getCssStyle(parentNode, "font-size");
-		let num = number * parseFloat(fs); //获得px单位的值
+		let num = Number((number * parseFloat(fs)).toFixed(2)); //获得px单位的值
 		return num;
 	}
 }

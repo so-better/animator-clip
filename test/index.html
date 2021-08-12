@@ -10,6 +10,10 @@
 		<script src="https://cdn.jsdelivr.net/npm/mvi-web/lib/mvi.umd.min.js" type="text/javascript" charset="utf-8">
 		</script>
 		<script src="../dist/animator-clip.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
+		<script>
+			new VConsole();
+		</script>
 		<style type="text/css">
 			[v-cloak] {
 				display: none;
@@ -93,6 +97,9 @@
 					},
 					complete:(clip,el)=>{
 						this.records.push(`动画完成【属性：${clip.style}，单位：${clip.$unit?clip.$unit:'无单位'}，速度：${clip.speed}，初始值：${clip.$initValue}，终点值：${clip.value}${clip.$unit?clip.$unit:''}】`);
+					},
+					beforeUpdate:(clip,el,style,value)=>{
+						console.log('动画帧更新之前触发')
 					},
 					update:(clip,el,style,value)=>{
 						if(style){

@@ -39,6 +39,9 @@ class Animator {
 		if (typeof this.$options.complete != 'function') {
 			this.$options.complete = function() {}
 		}
+		if (typeof this.$options.beforeUpdate != 'function') {
+			this.$options.beforeUpdate = function() {}
+		}
 		if (typeof this.$options.update != 'function') {
 			this.$options.update = function() {}
 		}
