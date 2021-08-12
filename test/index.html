@@ -220,6 +220,9 @@
 						value: (this.$refs.area.offsetWidth - this.$refs.el.offsetWidth) + 'px',
 						speed: 10
 					})
+					clip.on('beforeUpdate',(el,style,value)=>{
+						console.log(style,value)
+					})
 					this.animator.reset().removeAllClips().addClip(clip).start()
 				},
 				//向下移动
