@@ -1,5 +1,6 @@
 const path = require('path')
-let params = {
+
+module.exports = {
 	entry: './src/index.js', //入口文件
 	output: { //输出
 		path: path.resolve(__dirname, 'dist'),
@@ -13,9 +14,6 @@ let params = {
 			exclude: /node_modules/,
 			loader: "babel-loader"
 		}]
-	}
+	},
+	devtool: 'eval-source-map',
 }
-if(process.env.NODE_ENV == "production"){
-	params.devtool = 'eval-source-map'//调试可看到源码
-}
-module.exports = params;
