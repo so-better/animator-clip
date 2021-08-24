@@ -1,12 +1,11 @@
 {
 	"name": "animator-clip",
-	"version": "1.2.9",
+	"version": "1.2.10",
 	"description": "一个基于requestAnimationFrame封装的轻量级JS动画插件",
 	"main": "dist/animator-clip.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"serve": "webpack --mode development",
-		"build": "webpack --mode production"
+		"serve": "cross-env NODE_ENV=development webpack",
+		"build": "cross-env NODE_ENV=production webpack"
 	},
 	"keywords": [],
 	"author": "lingkai",
@@ -14,7 +13,8 @@
 	"devDependencies": {
 		"babel-core": "^6.26.3",
 		"babel-loader": "^7.1.5",
-		"babel-preset-env": "^1.7.0"
+		"babel-preset-env": "^1.7.0",
+		"cross-env": "^7.0.3"
 	},
 	"babel": {
 		"presets": [
