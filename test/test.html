@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>animator-clip测试</title>
+		<script src="../dist/animator-clip.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			#btn{
+				position: absolute;
+				left: 20px;
+				top: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<button type="button" id="btn" onclick="start()">按钮</button>
+		<button type="button" onclick="get()">按钮</button>
+	</body>
+	<script type="text/javascript">
+		const el = document.getElementById("btn")
+		const {Animator,Clip} = AnimatorClip
+		let animator = new Animator(el)
+		let clip = new Clip({
+			style:'left',
+			value:'400px',
+			speed:2
+		})
+		let clip2 = new Clip({
+			style:'left',
+			value:'20px',
+			speed:-2
+		})
+		clip.chain(clip2)
+		animator.addClip(clip)
+		
+		clip2.on('complete',function(el){
+			clip.state = 0
+			clip.start()
+		})
+		
+		clip.on('complete',function(){
+			clip2.state = 0
+		})
+		
+		function start(){
+			animator.start()
+		}
+		
+		function get(){
+			console.log(animator.getCompleteClips())
+		}
+		
+	</script>
+</html>
