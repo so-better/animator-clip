@@ -198,8 +198,7 @@ class Clip {
 				//clip触发beforeUpdate事件
 				this._emit('beforeUpdate', [this.style, currentValue])
 				//animator触发beforeUpdate事件
-				this.$parent.$options.beforeUpdate.call(this.$parent, this, this.$parent.$el, this.style,
-					currentValue)
+				this.$parent.$options.beforeUpdate.call(this.$parent, this, this.$parent.$el, this.style, currentValue)
 				//获取新的属性值
 				let newValue = Number((currentValue + this.speed).toFixed(2))
 				//给元素设置新属性值样式
