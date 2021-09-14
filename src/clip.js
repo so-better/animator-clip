@@ -5,35 +5,35 @@
 class Clip {
 	constructor(options) {
 		//唯一标志
-		this.id = null
+		this.id = undefined
 		//样式名称
-		this.style = null
+		this.style = undefined
 		//样式最终值
-		this.value = null
+		this.value = undefined
 		//动画速度，即每次样式改变的量
-		this.speed = null
+		this.speed = undefined
 		//是否自由模式
 		this.free = false
 		//动画每次更新间隔时间
 		this.interval = 0
 		//配置参数
 		this.$options = options
-		//样式单位，无单位则为null
-		this.$unit = null
+		//样式单位，无单位则为undefined
+		this.$unit = undefined
 		//动画api
-		this.$requestAnimationFrame = null
+		this.$requestAnimationFrame = undefined
 		//0表示动画初始状态，1表示动画进行状态，2表示动画停止状态，3表示动画完成状态
 		this.state = 0
 		//自定义事件数组
 		this.$events = []
 		//连续调用的动画
-		this.$chainClip = null
+		this.$chainClip = undefined
 		//0表示普通clip，1表示chain型clip
 		this.$type = 0
 		//属性值初始值
-		this.$initValue = null
+		this.$initValue = undefined
 		//animator实例
-		this.$parent = null
+		this.$parent = undefined
 		//每次动画帧执行时的时间戳记录
 		this.$timeStamp = 0
 		//执行初始化方法
@@ -47,7 +47,7 @@ class Clip {
 		//options参数不存在的情况下默认为自由模式
 		if (!this.$options) {
 			this.free = true
-			this.$options = null
+			this.$options = undefined
 		}
 		//options参数为对象
 		else if (typeof this.$options == 'object' && this.$options) {
@@ -63,7 +63,7 @@ class Clip {
 				if (typeof this.$options.style == 'string' && this.$options.style) {
 					this.style = this.$options.style
 				} else {
-					throw new TypeError('style should be a string')
+					throw new TypeError('The style argument should be a string')
 				}
 
 				//value
@@ -79,21 +79,21 @@ class Clip {
 					} else if (this.$options.value.endsWith('em')) { //如果是em单位的值
 						this.$unit = 'em' //记录单位
 					} else {
-						throw new Error('currently, only attribute values for PX and REM and EM units are supported')
+						throw new Error('Currently, only attribute values of px, rem, and em units are supported')
 					}
 				} else {
-					throw new TypeError('value should be a number or a string')
+					throw new TypeError('The value argument should be a number or string')
 				}
 
 				//speed
 				if (typeof this.$options.speed == 'number') {
 					this.speed = this.$options.speed
 				} else {
-					throw new TypeError('speed should be a number')
+					throw new TypeError('The speed argument should be a number')
 				}
 			}
 		} else { //options存在必须为对象，否则报错
-			throw new Error('the options constructor parameter for clip should be an object')
+			throw new Error('The construction parameter of the clip must be a non-null object')
 		}
 
 		//动画函数初始化
@@ -139,7 +139,7 @@ class Clip {
 	 */
 	start() {
 		if (!this.$parent || !this.$parent.$el) {
-			throw new ReferenceError('clip shoud be added to the Animator instance')
+			throw new ReferenceError('The clip has not been added to the animator')
 		}
 		//非free模式下进行属性值判断
 		if (!this.free) {
@@ -225,10 +225,10 @@ class Clip {
 					this.interval = 0
 					//动画运行结束，修改状态
 					this.state = 3
-					//animator触发complete事件
-					this.$parent.$options.complete.call(this.$parent, this, this.$parent.$el)
 					//clip触发complete事件
 					this._emit('complete')
+					//animator触发complete事件
+					this.$parent.$options.complete.call(this.$parent, this, this.$parent.$el)
 					//调用clip自身的chain型clip
 					if (this.$chainClip) {
 						//chain型clip如果已经加入到animator中
@@ -255,7 +255,7 @@ class Clip {
 	 */
 	stop() {
 		if (!this.$parent || !this.$parent.$el) {
-			throw new ReferenceError('clip shoud be added to the Animator instance')
+			throw new ReferenceError('The clip has not been added to the animator')
 		}
 		//非运行状态的动画帧无法停止
 		if (this.state != 1) {
@@ -280,7 +280,7 @@ class Clip {
 	 */
 	reset() {
 		if (!this.$parent || !this.$parent.$el) {
-			throw new ReferenceError('clip shoud be added to the Animator instance')
+			throw new ReferenceError('The clip has not been added to the animator')
 		}
 		//初始状态的动画帧无需重置
 		if (this.state == 0) {
@@ -314,13 +314,13 @@ class Clip {
 	 */
 	chain(clip) {
 		if (!clip) {
-			throw new TypeError('clip is not defined')
+			throw new TypeError('The parameter is not defined')
 		}
 		if (!(clip instanceof Clip)) {
-			throw new TypeError('clip is not a Clip instance')
+			throw new TypeError('The parameter is not a Clip instance')
 		}
 		if (clip.$parent) {
-			throw new ReferenceError('clip has already been added to other Animator instance')
+			throw new ReferenceError('The clip has been added to an animator instance and cannot be passed as a chain argument')
 		}
 		clip.$type = 1
 		this.$chainClip = clip
@@ -336,17 +336,25 @@ class Clip {
 		if (!this.free) {
 			return
 		}
+		if(this.state == 0 || this.state == 3){
+			return
+		}
 		//动画运行结束，修改状态
 		this.state = 3
-		//调用clip自身的chain型clip
-		if (this.$chainClip) {
-			this.$parent.addClip(this.$chainClip)
-			this.$chainClip.start()
-		}
 		//clip触发complete事件
 		this._emit('complete')
 		//animator触发complete事件
 		this.$parent.$options.complete.call(this.$parent, this, this.$parent.$el)
+		//调用clip自身的chain型clip
+		if (this.$chainClip) {
+			//chain型clip如果已经加入到animator中
+			if(this.$parent.hasClip(this.$chainClip)){
+				this.$parent.removeClip(this.$chainClip).addClip(this.$chainClip)
+			}else {
+				this.$parent.addClip(this.$chainClip)
+			}
+			this.$chainClip.start()
+		}
 	}
 
 	/**

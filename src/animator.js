@@ -23,10 +23,10 @@ class Animator {
 			this.$el = document.body.querySelector(this.$el)
 		}
 		if (!this.$el) {
-			throw new ReferenceError('el is not defined')
+			throw new ReferenceError('The first construction argument of an animator should be an element or selector')
 		}
 		if (!(this.$el instanceof Node) || this.$el.nodeType !== 1) {
-			throw new TypeError('el is not a node element')
+			throw new TypeError('The first construction argument of an animator should be an element or selector')
 		}
 
 		//参数初始化
@@ -72,18 +72,18 @@ class Animator {
 	 */
 	addClip(clip) {
 		if (!clip) {
-			throw new TypeError('clip is not defined')
+			throw new TypeError('Parameter does not exist')
 		}
 		if (!(clip instanceof Clip)) {
-			throw new TypeError('clip is not a Clip instance')
+			throw new TypeError('The parameter is not a Clip instance')
 		}
 		//clip存在于其他animator中
 		if (!this.hasClip(clip) && clip.$parent) {
-			throw new Error('clip has already been added to other animator')
+			throw new Error('The clip has been added to other animator')
 		}
 		//clip已经在animator中了
 		if (this.hasClip(clip)) {
-			throw new Error('clip has already been added to the animator')
+			throw new Error('The clip has been added to the animator')
 		}
 		//设置clip的id
 		if (this.clips.length == 0) {
@@ -113,34 +113,34 @@ class Animator {
 	 */
 	removeClip(clip) {
 		if (!clip) {
-			throw new TypeError('clip is not defined')
+			throw new TypeError('Parameter does not exist')
 		}
 		if (!(clip instanceof Clip)) {
-			throw new TypeError('clip is not a Clip instance')
+			throw new TypeError('The parameter is not a Clip instance')
 		}
 		if (!clip.$parent || typeof clip.id != 'number' || isNaN(clip.id)) {
-			throw new Error('the clip has not been added to the animator')
+			throw new Error('The clip has not been added to the animator')
 		}
 		if (!this.hasClip(clip)) {
-			throw new Error('the clip does not belong to the animator')
+			throw new Error('The clip does not belong to the animator')
 		}
-		//clips数组中移出
+		//更新clips数组
 		this.clips = this.clips.filter(item => {
 			return item.id != clip.id
 		})
 		//重置初始状态
 		clip.state = 0
-		//非free模式下处理
+		//非free模式下的处理
 		if (!clip.free) {
 			//恢复元素的初始样式
 			clip.$parent.$el.style.setProperty(clip.style, clip.$initValue, 'important')
 			//重置初始属性值
-			clip.$initValue = null
+			clip.$initValue = undefined
 		}
 		//重置父对象
-		clip.$parent = null
+		clip.$parent = undefined
 		//重置id
-		clip.id = null
+		clip.id = undefined
 		//返回animator实例
 		return this
 	}
