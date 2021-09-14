@@ -128,6 +128,10 @@ class Animator {
 		this.clips = this.clips.filter(item => {
 			return item.id != clip.id
 		})
+		//恢复初始的时间戳
+		this.$timeStamp = 0
+		//恢复初始间隔时间
+		this.interval = 0
 		//重置初始状态
 		clip.state = 0
 		//非free模式下的处理
