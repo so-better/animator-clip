@@ -300,6 +300,10 @@ class Clip {
 		this._emit('reset')
 		//animator触发reset事件
 		this.$parent.$options.reset.call(this.$parent, this, this.$parent.$el)
+		//如果是chain型clip，则从animator中移除
+		if(this.$type == 1){
+			this.$parent.removeClip(this)
+		}
 		//返回clip实例
 		return this
 	}

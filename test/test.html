@@ -23,31 +23,29 @@
 		let clip = new Clip({
 			style:'left',
 			value:'400px',
-			speed:2
+			speed:10
 		})
 		let clip2 = new Clip({
 			style:'left',
 			value:'20px',
-			speed:-2
+			speed:-10
 		})
-		clip.chain(clip2)
+		let clip3 = new Clip({
+			style:'top',
+			value:'400px',
+			speed:10
+		})
+		clip.chain(clip2).chain(clip3)
 		animator.addClip(clip)
 		
-		clip2.on('complete',function(el){
-			clip.state = 0
-			clip.start()
-		})
-		
-		clip.on('complete',function(){
-			clip2.state = 0
-		})
 		
 		function start(){
 			animator.start()
 		}
 		
 		function get(){
-			console.log(animator.getCompleteClips())
+			animator.removeAllClips()
+			console.log(animator.clips)
 		}
 		
 	</script>

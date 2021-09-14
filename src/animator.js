@@ -89,8 +89,8 @@ class Animator {
 		if (this.clips.length == 0) {
 			clip.id = 0
 		} else {
-			let lastClip = this.clips[this.clips.length - 1]
-			clip.id = lastClip.id + 1
+			let maxClipId = this.clips[0].id
+			clip.id = maxClipId + 1
 		}
 		//设置父对象
 		clip.$parent = this
@@ -103,7 +103,7 @@ class Animator {
 			}
 		}
 		//将clip加入到clips中去
-		this.clips.push(clip)
+		this.clips.unshift(clip)
 		return this
 	}
 
@@ -210,17 +210,8 @@ class Animator {
 	 * 重置动画
 	 */
 	reset() {
-		let chainClips = []
 		this.clips.forEach(clip => {
 			clip.reset()
-			//如果是chain型clip则记录到数组内
-			if (clip.$type == 1) {
-				chainClips.push(clip)
-			}
-		})
-		//遍历记录的数组，将chain型clip移除
-		chainClips.forEach(clip => {
-			this.removeClip(clip)
 		})
 		return this
 	}
