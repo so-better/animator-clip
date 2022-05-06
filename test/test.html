@@ -1,53 +1,39 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>animator-clip测试</title>
-		<script src="../dist/animator-clip.js" type="text/javascript" charset="utf-8"></script>
-		<style type="text/css">
-			#btn{
-				position: absolute;
-				left: 20px;
-				top: 20px;
-			}
-		</style>
-	</head>
-	<body>
-		<button type="button" id="btn" onclick="start()">按钮</button>
-		<button type="button" onclick="get()">按钮</button>
-	</body>
-	<script type="text/javascript">
-		const el = document.getElementById("btn")
-		const {Animator,Clip} = AnimatorClip
-		let animator = new Animator(el)
-		let clip = new Clip({
-			style:'left',
-			value:'400px',
-			speed:10
-		})
-		let clip2 = new Clip({
-			style:'left',
-			value:'20px',
-			speed:-10
-		})
-		let clip3 = new Clip({
-			style:'top',
-			value:'400px',
-			speed:10
-		})
-		clip.chain(clip2).chain(clip3)
-		animator.addClip(clip)
-		
-		
-		function start(){
-			animator.start()
-		}
-		
-		function get(){
-			console.log(animator.clips)
-			animator.reset()
-			console.log(animator.clips)
-		}
-		
-	</script>
+    <head>
+        <meta charset="utf-8" />
+        <title>animator-clip测试</title>
+        <script
+            src="../dist/animator-clip.js"
+            type="text/javascript"
+            charset="utf-8"
+        ></script>
+        <style type="text/css">
+            #btn {
+                position: absolute;
+                left: 20px;
+                top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <button id="btn">动画按钮</button>
+    </body>
+    <script type="text/javascript">
+        const el = document.getElementById('btn')
+        const { Animator, Clip } = AnimatorClip
+        const animator = new Animator(el)
+        const clip = new Clip({
+            style: 'height',
+            value: '200px',
+            speed: 1
+        })
+        const clip2 = new Clip({
+            style: 'width',
+            value: '300px',
+            speed: 1
+        })
+        clip.chain(clip2)
+        animator.addClip(clip).start()
+    </script>
 </html>

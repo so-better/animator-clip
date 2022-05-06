@@ -219,8 +219,9 @@ class Clip {
                 )
                 //递归调用动画
                 this.$requestAnimationFrame.call(window, doFun)
-            } else {
-                //非free模式下
+            }
+            //非free模式下
+            else {
                 //获取当前属性值
                 let currentValue = this._getUnitCssValue()
                 //clip触发beforeUpdate事件
@@ -495,7 +496,7 @@ class Clip {
      * @param {Object} eventName
      */
     _getEvent(eventName) {
-        let arr = this.$events.filter((event, index) => {
+        let arr = this.$events.filter(event => {
             return event.name == eventName
         })
         return arr[0]

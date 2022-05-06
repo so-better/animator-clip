@@ -132,12 +132,12 @@ class Animator {
         this.clips = this.clips.filter(item => {
             return item.id != clip.id
         })
-        //恢复初始的时间戳
-        this.$timeStamp = 0
-        //恢复初始间隔时间
-        this.interval = 0
         //重置初始状态
         clip.state = 0
+        //恢复初始的时间戳
+        clip.$timeStamp = 0
+        //恢复初始间隔时间
+        clip.interval = 0
         //非free模式下的处理
         if (!clip.free) {
             //恢复元素的初始样式
@@ -172,30 +172,27 @@ class Animator {
      * 获取正在运行的clip
      */
     getClips() {
-        let clips = this.clips.filter((clip, index) => {
+        return this.clips.filter(clip => {
             return clip.state == 1
         })
-        return clips
     }
 
     /**
      * 获取停止状态的clip
      */
     getStopClips() {
-        let clips = this.clips.filter((clip, index) => {
+        return this.clips.filter(clip => {
             return clip.state == 2
         })
-        return clips
     }
 
     /**
      * 获取已完成的clip
      */
     getCompleteClips() {
-        let clips = this.clips.filter((clip, index) => {
+        return this.clips.filter(clip => {
             return clip.state == 3
         })
-        return clips
     }
 
     /**
