@@ -33,6 +33,9 @@
             value: '300px',
             speed: 1
         })
+        clip2.on('complete', () => {
+            animator.reset()
+        })
         clip.chain(clip2)
         animator.addClip(clip).start()
     </script>

@@ -183,10 +183,10 @@ class Clip {
         this.interval = 0
         //更改帧状态
         this.state = 1
-        //clip触发start事件
-        this._emit('start')
         //animator触发start事件,clip作为参数
         this.$parent.$options.start.call(this.$parent, this, this.$parent.$el)
+        //clip触发start事件
+        this._emit('start')
         //动画帧执行函数
         let doFun = () => {
             //每一帧运行时判断是否处在运行状态
@@ -201,22 +201,22 @@ class Clip {
             this.$timeStamp = now
             //free模式下
             if (this.free) {
-                //clip触发beforeUpdate事件
-                this._emit('beforeUpdate')
                 //animator触发beforeUpdate事件
                 this.$parent.$options.beforeUpdate.call(
                     this.$parent,
                     this,
                     this.$parent.$el
                 )
-                //clip触发update事件
-                this._emit('update')
+                //clip触发beforeUpdate事件
+                this._emit('beforeUpdate')
                 //animator触发update事件
                 this.$parent.$options.update.call(
                     this.$parent,
                     this,
                     this.$parent.$el
                 )
+                //clip触发update事件
+                this._emit('update')
                 //递归调用动画
                 this.$requestAnimationFrame.call(window, doFun)
             }
@@ -224,8 +224,6 @@ class Clip {
             else {
                 //获取当前属性值
                 let currentValue = this._getUnitCssValue()
-                //clip触发beforeUpdate事件
-                this._emit('beforeUpdate', [this.style, currentValue])
                 //animator触发beforeUpdate事件
                 this.$parent.$options.beforeUpdate.call(
                     this.$parent,
@@ -234,6 +232,8 @@ class Clip {
                     this.style,
                     currentValue
                 )
+                //clip触发beforeUpdate事件
+                this._emit('beforeUpdate', [this.style, currentValue])
                 //获取新的属性值
                 let newValue = Number((currentValue + this.speed).toFixed(2))
                 //给元素设置新属性值样式
@@ -250,8 +250,6 @@ class Clip {
                         'important'
                     )
                 }
-                //clip触发update事件
-                this._emit('update', [this.style, newValue])
                 //animator触发update事件
                 this.$parent.$options.update.call(
                     this.$parent,
@@ -260,6 +258,9 @@ class Clip {
                     this.style,
                     newValue
                 )
+                //clip触发update事件
+                this._emit('update', [this.style, newValue])
+
                 //达到目标值完成动画
                 if (
                     (this.speed > 0 && newValue >= this.value) ||
@@ -285,14 +286,14 @@ class Clip {
                     this.interval = 0
                     //动画运行结束，修改状态
                     this.state = 3
-                    //clip触发complete事件
-                    this._emit('complete')
                     //animator触发complete事件
                     this.$parent.$options.complete.call(
                         this.$parent,
                         this,
                         this.$parent.$el
                     )
+                    //clip触发complete事件
+                    this._emit('complete')
                     //调用clip自身的chain型clip
                     if (this.$chainClip) {
                         //chain型clip如果已经加入到animator中
@@ -335,10 +336,10 @@ class Clip {
         this.interval = 0
         //修改状态
         this.state = 2
-        //clip触发stop事件
-        this._emit('stop')
         //animator触发stop事件
         this.$parent.$options.stop.call(this.$parent, this, this.$parent.$el)
+        //clip触发stop事件
+        this._emit('stop')
         //返回clip实例
         return this
     }
@@ -370,10 +371,10 @@ class Clip {
                 'important'
             )
         }
-        //触发clip的reset事件
-        this._emit('reset')
         //animator触发reset事件
         this.$parent.$options.reset.call(this.$parent, this, this.$parent.$el)
+        //触发clip的reset事件
+        this._emit('reset')
         //如果是chain型clip，则从animator中移除
         if (this.$type == 1) {
             this.$parent.removeClip(this)
@@ -417,14 +418,14 @@ class Clip {
         }
         //动画运行结束，修改状态
         this.state = 3
-        //clip触发complete事件
-        this._emit('complete')
         //animator触发complete事件
         this.$parent.$options.complete.call(
             this.$parent,
             this,
             this.$parent.$el
         )
+        //clip触发complete事件
+        this._emit('complete')
         //调用clip自身的chain型clip
         if (this.$chainClip) {
             //chain型clip如果已经加入到animator中
