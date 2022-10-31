@@ -1,4 +1,7 @@
-import Animator from './animator'
-import Clip from './clip'
+const Animator = require('./animator')
+const Clip = require('./clip')
 
-export { Animator, Clip }
+module.exports = {
+    Animator,
+    Clip
+}
