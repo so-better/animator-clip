@@ -585,4 +585,4 @@ class Clip {
     }
 }
 
-module.exports = Clip
+export default Clip

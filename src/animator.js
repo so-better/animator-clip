@@ -1,5 +1,5 @@
 //引入Clip类对象
-const Clip = require('./clip')
+import Clip from './clip'
 /**
  * Animator类对象
  * @param {Object} el
@@ -226,4 +226,4 @@ class Animator {
     }
 }
 
-module.exports = Animator
+export default Animator
