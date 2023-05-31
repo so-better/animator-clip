@@ -26,7 +26,7 @@ export default defineConfig({
 		minify: 'terser',
 		lib: {
 			entry: path.resolve(__dirname, 'src/index.js'),
-			name: 'animator-clip',
+			name: 'AnimatorClip',
 			fileName: format => `animator-clip.${format}.js`
 		},
 		rollupOptions: {
