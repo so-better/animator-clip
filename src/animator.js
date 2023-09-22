@@ -210,9 +210,9 @@ class Animator {
 	/**
 	 * 重置动画
 	 */
-	reset() {
+	reset(reStoreStyle = true) {
 		this.clips.forEach(clip => {
-			clip.reset()
+			clip.reset(reStoreStyle)
 		})
 		return this
 	}
