@@ -9,9 +9,9 @@ export default {
 	mounted() {
 		const animator = new Animator('#btn')
 		const clip = new Clip({
-			style: 'width',
-			speed: 1,
-			value: '400px'
+			style: 'opacity',
+			speed: -0.004,
+			value: 0
 		})
 		animator.addClip(clip).start()
 	}

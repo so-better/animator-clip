@@ -97,9 +97,9 @@ class Animator {
 		//非free模式下需要记录初始值
 		if (!clip.free) {
 			if (clip.$unit) {
-				clip.$initValue = clip._getUnitCssValue() + clip.$unit
+				clip.$initValue = clip.__getUnitCssValue() + clip.$unit
 			} else {
-				clip.$initValue = clip._getUnitCssValue()
+				clip.$initValue = clip.__getUnitCssValue()
 			}
 		}
 		//将clip加入到clips中去

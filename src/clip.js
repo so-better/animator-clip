@@ -149,7 +149,7 @@ class Clip {
 		//非free模式下进行属性值判断
 		if (!this.free) {
 			//获取初始属性值
-			let oldValue = this._getUnitCssValue()
+			let oldValue = this.__getUnitCssValue()
 			//如果属性为渐增的且属性值已经超过目标属性值大小，则不进行动画
 			if (this.speed > 0 && oldValue >= this.value) {
 				return this
@@ -170,7 +170,7 @@ class Clip {
 		//更改帧状态
 		this.state = 1
 		//animator触发start事件,clip作为参数
-		this.$parent.$options.start.call(this.$parent, this, this.$parent.$el)
+		this.$parent.$options.start.apply(this.$parent, [this, this.$parent.$el])
 		//clip触发start事件
 		this.__emit('start')
 		//动画帧执行函数
@@ -188,26 +188,26 @@ class Clip {
 			//free模式下
 			if (this.free) {
 				//animator触发beforeUpdate事件
-				this.$parent.$options.beforeUpdate.call(this.$parent, this, this.$parent.$el)
+				this.$parent.$options.beforeUpdate.apply(this.$parent, [this, this.$parent.$el])
 				//clip触发beforeUpdate事件
 				this.__emit('beforeUpdate')
 				//animator触发update事件
-				this.$parent.$options.update.call(this.$parent, this, this.$parent.$el)
+				this.$parent.$options.update.apply(this.$parent, [this, this.$parent.$el])
 				//clip触发update事件
 				this.__emit('update')
 				//递归调用动画
-				this.$requestAnimationFrame.call(window, doFun)
+				this.$requestAnimationFrame.apply(window, [doFun])
 			}
 			//非free模式下
 			else {
 				//获取当前属性值
-				let currentValue = this._getUnitCssValue()
+				let currentValue = this.__getUnitCssValue()
 				//animator触发beforeUpdate事件
-				this.$parent.$options.beforeUpdate.call(this.$parent, this, this.$parent.$el, this.style, currentValue)
+				this.$parent.$options.beforeUpdate.apply(this.$parent, [this, this.$parent.$el, this.style, currentValue])
 				//clip触发beforeUpdate事件
 				this.__emit('beforeUpdate', [this.style, currentValue])
 				//获取新的属性值
-				let newValue = Number((currentValue + this.speed).toFixed(2))
+				let newValue = currentValue + this.speed
 				//给元素设置新属性值样式
 				if (this.$unit) {
 					this.$parent.$el.style.setProperty(this.style, newValue + this.$unit, 'important')
@@ -215,7 +215,7 @@ class Clip {
 					this.$parent.$el.style.setProperty(this.style, newValue, 'important')
 				}
 				//animator触发update事件
-				this.$parent.$options.update.call(this.$parent, this, this.$parent.$el, this.style, newValue)
+				this.$parent.$options.update.apply(this.$parent, [this, this.$parent.$el, this.style, newValue])
 				//clip触发update事件
 				this.__emit('update', [this.style, newValue])
 
@@ -234,7 +234,7 @@ class Clip {
 					//动画运行结束，修改状态
 					this.state = 3
 					//animator触发complete事件
-					this.$parent.$options.complete.call(this.$parent, this, this.$parent.$el)
+					this.$parent.$options.complete.apply(this.$parent, [this, this.$parent.$el])
 					//clip触发complete事件
 					this.__emit('complete')
 					//调用clip自身的chain型clip
@@ -249,11 +249,11 @@ class Clip {
 					}
 				} else {
 					//没有达到目标值则继续进行动画
-					this.$requestAnimationFrame.call(window, doFun)
+					this.$requestAnimationFrame.apply(window, [doFun])
 				}
 			}
 		}
-		this.$requestAnimationFrame.call(window, doFun)
+		this.$requestAnimationFrame.apply(window, [doFun])
 		//返回clip实例
 		return this
 	}
@@ -276,7 +276,7 @@ class Clip {
 		//修改状态
 		this.state = 2
 		//animator触发stop事件
-		this.$parent.$options.stop.call(this.$parent, this, this.$parent.$el)
+		this.$parent.$options.stop.apply(this.$parent, [this, this.$parent.$el])
 		//clip触发stop事件
 		this.__emit('stop')
 		//返回clip实例
@@ -286,7 +286,7 @@ class Clip {
 	/**
 	 * 重置动画
 	 */
-	reset() {
+	reset(reStoreStyle = true) {
 		if (!this.$parent || !this.$parent.$el) {
 			throw new ReferenceError('The clip has not been added to the animator')
 		}
@@ -300,12 +300,12 @@ class Clip {
 		this.interval = 0
 		//修改状态
 		this.state = 0
-		//非free模式下恢复初始属性值
-		if (!this.free) {
+		//非free模式下如果reStoreStyle是true则恢复元素的初始属性值
+		if (!this.free && reStoreStyle) {
 			this.$parent.$el.style.setProperty(this.style, this.$initValue, 'important')
 		}
 		//animator触发reset事件
-		this.$parent.$options.reset.call(this.$parent, this, this.$parent.$el)
+		this.$parent.$options.reset.apply(this.$parent, [this, this.$parent.$el])
 		//触发clip的reset事件
 		this.__emit('reset')
 		//如果是chain型clip，则从animator中移除
@@ -350,7 +350,7 @@ class Clip {
 		//动画运行结束，修改状态
 		this.state = 3
 		//animator触发complete事件
-		this.$parent.$options.complete.call(this.$parent, this, this.$parent.$el)
+		this.$parent.$options.complete.apply(this.$parent, [this, this.$parent.$el])
 		//clip触发complete事件
 		this.__emit('complete')
 		//调用clip自身的chain型clip
@@ -371,7 +371,7 @@ class Clip {
 	 * @param {Object} handler
 	 */
 	on(eventName, handler) {
-		let event = this._getEvent(eventName)
+		let event = this.__getEvent(eventName)
 		if (event) {
 			event.handler = handler
 		} else {
@@ -404,12 +404,12 @@ class Clip {
 	 * @param {Object} params
 	 */
 	__emit(eventName, params) {
-		let event = this._getEvent(eventName)
+		let event = this.__getEvent(eventName)
 		if (event) {
 			if (params) {
-				event.handler.call(this, this.$parent.$el, ...params)
+				event.handler.apply(this, [this.$parent.$el, ...params])
 			} else {
-				event.handler.call(this, this.$parent.$el)
+				event.handler.apply(this, [this.$parent.$el])
 			}
 		}
 	}
@@ -418,7 +418,7 @@ class Clip {
 	 * 获取事件数组中指定事件
 	 * @param {Object} eventName
 	 */
-	_getEvent(eventName) {
+	__getEvent(eventName) {
 		let arr = this.$events.filter(event => {
 			return event.name == eventName
 		})
@@ -428,14 +428,14 @@ class Clip {
 	/**
 	 * 获取元素基于单位$unit的值
 	 */
-	_getUnitCssValue() {
+	__getUnitCssValue() {
 		//获取px单位的值
-		let value = parseFloat(this._getCssStyle(this.$parent.$el, this.style))
+		let value = parseFloat(this.__getCssStyle(this.$parent.$el, this.style))
 		//如果$unit为rem
 		if (this.$unit == 'rem') {
-			return this._px2rem(value)
+			return this.__px2rem(value)
 		} else if (this.$unit == 'em') {
-			return this._px2em(this.$parent.$el, value)
+			return this.__px2em(this.$parent.$el, value)
 		}
 		//px单位或者无单位直接返回value
 		return value
@@ -446,7 +446,7 @@ class Clip {
 	 * @param {Object} el
 	 * @param {Object} cssName
 	 */
-	_getCssStyle(el, cssName) {
+	__getCssStyle(el, cssName) {
 		if (typeof cssName == 'string') {
 			let cssText = ''
 			//兼容IE9-IE11、chrome、firefox、safari、opera；不兼容IE7-IE8
@@ -466,20 +466,20 @@ class Clip {
 	 * rem转为px
 	 * @param {Object} number
 	 */
-	_rem2px(number) {
-		let fs = this._getCssStyle(document.documentElement, 'font-size')
-		let num = Number((number * parseFloat(fs)).toFixed(2)) //获得px单位的值
-		return num
+	__rem2px(number) {
+		let fs = this.__getCssStyle(document.documentElement, 'font-size')
+		//获得px单位的值
+		return number * parseFloat(fs)
 	}
 
 	/**
 	 * px转为rem
 	 * @param {Object} number
 	 */
-	_px2rem(number) {
-		let fs = this._getCssStyle(document.documentElement, 'font-size')
-		let num = Number((number / parseFloat(fs)).toFixed(2)) //获得rem单位的值
-		return num
+	__px2rem(number) {
+		let fs = this.__getCssStyle(document.documentElement, 'font-size')
+		//获得rem单位的值
+		return number / parseFloat(fs)
 	}
 
 	/**
@@ -487,11 +487,11 @@ class Clip {
 	 * @param {Object} el
 	 * @param {Object} number
 	 */
-	_px2em(el, number) {
+	__px2em(el, number) {
 		let parentNode = el.parentNode || el.parentElement
-		let fs = this._getCssStyle(parentNode, 'font-size')
-		let num = Number((number / parseFloat(fs)).toFixed(2)) //获得em单位的值
-		return num
+		let fs = this.__getCssStyle(parentNode, 'font-size')
+		//获得em单位的值
+		return number / parseFloat(fs)
 	}
 
 	/**
@@ -499,11 +499,11 @@ class Clip {
 	 * @param {Object} el
 	 * @param {Object} number
 	 */
-	_em2px(el, number) {
+	__em2px(el, number) {
 		let parentNode = el.parentNode || el.parentElement
-		let fs = this._getCssStyle(parentNode, 'font-size')
-		let num = Number((number * parseFloat(fs)).toFixed(2)) //获得px单位的值
-		return num
+		let fs = this.__getCssStyle(parentNode, 'font-size')
+		//获得px单位的值
+		return number * parseFloat(fs)
 	}
 }
 
