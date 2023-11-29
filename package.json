@@ -7,7 +7,7 @@
 	"main": "lib/animator-clip.umd.js",
 	"module": "lib/animator-clip.es.js",
 	"license": "MIT",
-	"description": "一个基于requestAnimationFrame封装的轻量级JS动画插件",
+	"description": "一个基于requestAnimationFrame封装的轻量级高性能JS动画库",
 	"scripts": {
 		"dev": "vite --host",
 		"lib": "vite build"
