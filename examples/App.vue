@@ -4,7 +4,7 @@
 	</div>
 </template>
 <script>
-import { Animator, Clip } from '../src'
+import { Animator, Clip } from '../src/index'
 export default {
 	mounted() {
 		const animator = new Animator('#btn')

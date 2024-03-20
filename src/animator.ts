@@ -1,34 +1,43 @@
 //引入Clip类对象
-import Clip from './clip'
+import { Clip } from './clip'
+
+export type AnimatorOptionsType = {
+	start?: (clip: Clip, el: HTMLElement) => void
+	stop?: (clip: Clip, el: HTMLElement) => void
+	complete?: (clip: Clip, el: HTMLElement) => void
+	reset?: (clip: Clip, el: HTMLElement) => void
+	beforeUpdate?: (clip: Clip, el: HTMLElement, style?: string, value?: number) => void
+	update?: (clip: Clip, el: HTMLElement, style?: string, value?: number) => void
+}
+
 /**
  * Animator类对象
- * @param {Object} el
- * @param {Object} options
  */
-class Animator {
-	//构造方法
-	constructor(el, options) {
-		this.$el = el //动画绑定元素
-		this.$options = options //参数配置
-		this.clips = [] //该实例下的所有clip实例
-		this.__init() //调用初始化方法
-	}
+export class Animator {
+	//动画绑定元素
+	$el: HTMLElement
+	//参数配置
+	$options?: AnimatorOptionsType
+	//该实例下的所有clip实例
+	clips: Clip[]
 
-	/**
-	 * 初始化方法
-	 */
-	__init() {
+	//构造方法
+	constructor(el: HTMLElement | string, options?: AnimatorOptionsType) {
 		//动画元素绑定
-		if (typeof this.$el == 'string' && this.$el) {
-			this.$el = document.body.querySelector(this.$el)
+		if (typeof el == 'string' && el) {
+			this.$el = document.body.querySelector(el)!
+		} else {
+			this.$el = <HTMLElement>el
 		}
+		this.$options = options
+		this.clips = []
+
 		if (!this.$el) {
 			throw new ReferenceError('The first construction argument of an animator should be an element or selector')
 		}
 		if (!(this.$el instanceof Node) || this.$el.nodeType !== 1) {
 			throw new TypeError('The first construction argument of an animator should be an element or selector')
 		}
-
 		//参数初始化
 		if (typeof this.$options != 'object' || !this.$options) {
 			this.$options = {}
@@ -55,9 +64,8 @@ class Animator {
 
 	/**
 	 * 判断是否包含某个clip
-	 * @param {Object} clip
 	 */
-	hasClip(clip) {
+	hasClip(clip: Clip) {
 		if (!clip.$parent || typeof clip.id != 'number' || isNaN(clip.id)) {
 			return false
 		}
@@ -68,9 +76,8 @@ class Animator {
 
 	/**
 	 * 将clip添加到队列
-	 * @param {Object} clip
 	 */
-	addClip(clip) {
+	addClip(clip: Clip) {
 		if (!clip) {
 			throw new TypeError('Parameter does not exist')
 		}
@@ -89,7 +96,7 @@ class Animator {
 		if (this.clips.length == 0) {
 			clip.id = 0
 		} else {
-			let maxClipId = this.clips[0].id
+			let maxClipId = this.clips[0].id!
 			clip.id = maxClipId + 1
 		}
 		//设置父对象
@@ -111,7 +118,7 @@ class Animator {
 	 * 将clip移出队列
 	 * @param {Object} clip
 	 */
-	removeClip(clip) {
+	removeClip(clip: Clip) {
 		if (!clip) {
 			throw new TypeError('Parameter does not exist')
 		}
@@ -137,7 +144,7 @@ class Animator {
 		//非free模式下的处理
 		if (!clip.free) {
 			//恢复元素的初始样式
-			clip.$parent.$el.style.setProperty(clip.style, clip.$initValue, 'important')
+			clip.$parent.$el.style.setProperty(clip.style!, clip.$initValue + '', 'important')
 			//重置初始属性值
 			clip.$initValue = undefined
 		}
@@ -217,5 +224,3 @@ class Animator {
 		return this
 	}
 }
-
-export default Animator
