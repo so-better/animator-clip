@@ -7,7 +7,11 @@
 import { Animator, Clip } from '../src/index'
 export default {
 	mounted() {
-		const animator = new Animator('#btn')
+		const animator = new Animator('#btn', {
+			complete: () => {
+				animator.reset()
+			}
+		})
 		const clip = new Clip({
 			style: 'opacity',
 			speed: -0.004,

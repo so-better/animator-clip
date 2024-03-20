@@ -288,13 +288,17 @@ export class Clip {
 	/**
 	 * 重置动画
 	 */
-	reset(reStoreStyle = true) {
+	reset(reStoreStyle?: boolean) {
 		if (!this.$parent || !this.$parent.$el) {
 			throw new ReferenceError('The clip has not been added to the animator')
 		}
 		//初始状态的动画帧无需重置
 		if (this.state == 0) {
 			return this
+		}
+		//默认为true
+		if (typeof reStoreStyle != 'boolean') {
+			reStoreStyle = true
 		}
 		//恢复初始的时间戳
 		this.$timeStamp = 0
@@ -446,7 +450,7 @@ export class Clip {
 	 * @param {Object} el
 	 * @param {Object} cssName
 	 */
-	private __getCssStyle(el: HTMLElement, cssName: string) {
+	private __getCssStyle(el: HTMLElement, cssName?: string) {
 		if (typeof cssName == 'string') {
 			let cssText = ''
 			//兼容IE9-IE11、chrome、firefox、safari、opera；不兼容IE7-IE8

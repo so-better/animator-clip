@@ -217,7 +217,7 @@ export class Animator {
 	/**
 	 * 重置动画
 	 */
-	reset(reStoreStyle = true) {
+	reset(reStoreStyle?: boolean) {
 		this.clips.forEach(clip => {
 			clip.reset(reStoreStyle)
 		})
