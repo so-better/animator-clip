@@ -1,9 +1,9 @@
 {
 	"name": "animator-clip",
-	"version": "1.4.2",
+	"version": "1.4.3",
 	"private": false,
 	"type": "module",
-	"author": "kailing",
+	"author": "so-better",
 	"main": "lib/animator-clip.umd.js",
 	"module": "lib/animator-clip.es.js",
 	"types": "lib/index.d.ts",
@@ -32,6 +32,6 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ling0523/animator-clip"
+		"url": "https://github.com/so-better/animator-clip"
 	}
 }
