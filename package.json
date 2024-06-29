@@ -1,9 +1,9 @@
 {
 	"name": "animator-clip",
-	"version": "1.4.1",
+	"version": "1.4.2",
 	"private": false,
 	"type": "module",
-	"author": "ling0523",
+	"author": "kailing",
 	"main": "lib/animator-clip.umd.js",
 	"module": "lib/animator-clip.es.js",
 	"types": "lib/index.d.ts",
