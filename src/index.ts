@@ -1,4 +1,4 @@
-import { Animator } from './animator'
-import { Clip } from './clip'
+import { Animator } from '@/model/animator'
+import { Clip } from '@/model/clip'
 
-export { Animator, Clip, Animator as default }
+export { Animator, Clip }
