@@ -129,7 +129,7 @@ export declare class Clip {
      * 每次动画帧执行的时间戳记录
      */
     timeStamp: number;
-    constructor(options?: ClipOptionsType);
+    constructor(options: ClipOptionsType);
     /**
      * 开始动画
      */

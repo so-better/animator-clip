@@ -105,5 +105,5 @@ export declare class Animator {
     /**
      * 重置动画
      */
-    reset(resetStyle?: boolean): this;
+    reset(resetStyle?: boolean | undefined): this;
 }

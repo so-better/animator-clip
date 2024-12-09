@@ -215,7 +215,7 @@ export class Animator {
   /**
    * 重置动画
    */
-  reset(resetStyle?: boolean) {
+  reset(resetStyle: boolean | undefined = true) {
     this.children.forEach(item => {
       item.reset(resetStyle)
     })

@@ -54,6 +54,15 @@ export default defineConfig({
               link: '/guide/clip'
             }
           ]
+        },
+        {
+          text: '其他',
+          items: [
+            {
+              text: '自由模式',
+              link: '/guide/free'
+            }
+          ]
         }
       ]
     },

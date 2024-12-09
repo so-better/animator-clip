@@ -137,22 +137,20 @@ export class Clip {
    */
   timeStamp: number = 0
 
-  constructor(options?: ClipOptionsType) {
-    if (options) {
+  constructor(options: ClipOptionsType) {
+    this.free = options.free ?? false
+    if (!this.free) {
       this.style = options.style
       this.speed = options.speed
-      this.free = options.free ?? false
       this.value = typeof options.value == 'number' ? options.value : parseFloat(options.value)
       this.unit = this.getUnit(options.value)
-      if (options.onStart) this.onStart = options.onStart
-      if (options.onStop) this.onStop = options.onStop
-      if (options.onReset) this.onReset = options.onReset
-      if (options.onBeforeUpdate) this.onBeforeUpdate = options.onBeforeUpdate
-      if (options.onUpdate) this.onUpdate = options.onUpdate
-      if (options.onComplete) this.onComplete = options.onComplete
-    } else {
-      this.free = true
     }
+    if (options.onStart) this.onStart = options.onStart
+    if (options.onStop) this.onStop = options.onStop
+    if (options.onReset) this.onReset = options.onReset
+    if (options.onBeforeUpdate) this.onBeforeUpdate = options.onBeforeUpdate
+    if (options.onUpdate) this.onUpdate = options.onUpdate
+    if (options.onComplete) this.onComplete = options.onComplete
     this.requestAnimationFrame = this.getRequestAnimationFrame()
   }
 
