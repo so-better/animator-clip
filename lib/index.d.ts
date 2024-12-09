@@ -1,3 +1,2 @@
-import { Animator } from './animator';
-import { Clip } from './clip';
-export { Animator, Clip, Animator as default };
+export * from './model/animator';
+export * from './model/clip';

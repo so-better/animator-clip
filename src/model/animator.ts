@@ -8,27 +8,27 @@ export type AnimatorOptionsType = {
   /**
    * 动画开始事件
    */
-  onStart?: (clip: Clip, el: HTMLElement) => void
+  onStart?: (this: Animator, clip: Clip, el: HTMLElement) => void
   /**
    * 动画停止事件
    */
-  onStop?: (clip: Clip, el: HTMLElement) => void
+  onStop?: (this: Animator, clip: Clip, el: HTMLElement) => void
   /**
    * 动画重置事件
    */
-  onReset?: (clip: Clip, el: HTMLElement) => void
+  onReset?: (this: Animator, clip: Clip, el: HTMLElement) => void
   /**
    * 动画更新前事件，此时样式还未改变
    */
-  onBeforeUpdate?: (clip: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
+  onBeforeUpdate?: (this: Animator, clip: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
   /**
    * 动画更新时事件，此时样式已经改变
    */
-  onUpdate?: (clip: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
+  onUpdate?: (this: Animator, clip: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
   /**
    * 动画完成事件
    */
-  onComplete?: (clip: Clip, el: HTMLElement) => void
+  onComplete?: (this: Animator, clip: Clip, el: HTMLElement) => void
 }
 
 /**
@@ -42,27 +42,27 @@ export class Animator {
   /**
    * 动画开始事件
    */
-  onStart?: (clip: Clip, el: HTMLElement) => void
+  onStart?: (this: Animator, clip: Clip, el: HTMLElement) => void
   /**
    * 动画停止事件
    */
-  onStop?: (clip: Clip, el: HTMLElement) => void
+  onStop?: (this: Animator, clip: Clip, el: HTMLElement) => void
   /**
    * 动画重置事件
    */
-  onReset?: (clip: Clip, el: HTMLElement) => void
+  onReset?: (this: Animator, clip: Clip, el: HTMLElement) => void
   /**
    * 动画更新前事件，此时样式还未改变
    */
-  onBeforeUpdate?: (clip: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
+  onBeforeUpdate?: (this: Animator, clip: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
   /**
    * 动画更新时事件，此时样式已经改变
    */
-  onUpdate?: (clip: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
+  onUpdate?: (this: Animator, clip: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
   /**
    * 动画完成事件
    */
-  onComplete?: (clip: Clip, el: HTMLElement) => void
+  onComplete?: (this: Animator, clip: Clip, el: HTMLElement) => void
   /**
    * 动画下的实例
    */

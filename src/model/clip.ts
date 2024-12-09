@@ -26,27 +26,27 @@ export type ClipOptionsType = {
   /**
    * 动画开始事件
    */
-  onStart?: (el: HTMLElement) => void
+  onStart?: (this: Clip, el: HTMLElement) => void
   /**
    * 动画停止事件
    */
-  onStop?: (el: HTMLElement) => void
+  onStop?: (this: Clip, el: HTMLElement) => void
   /**
    * 动画重置事件
    */
-  onReset?: (el: HTMLElement) => void
+  onReset?: (this: Clip, el: HTMLElement) => void
   /**
    * 动画更新前事件，此时样式还未改变
    */
-  onBeforeUpdate?: (el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
+  onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
   /**
    * 动画更新时事件，此时样式已经改变
    */
-  onUpdate?: (el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
+  onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
   /**
    * 动画完成事件
    */
-  onComplete?: (el: HTMLElement) => void
+  onComplete?: (this: Clip, el: HTMLElement) => void
 }
 
 /**
@@ -72,27 +72,27 @@ export class Clip {
   /**
    * 动画开始事件
    */
-  onStart?: (el: HTMLElement) => void
+  onStart?: (this: Clip, el: HTMLElement) => void
   /**
    * 动画停止事件
    */
-  onStop?: (el: HTMLElement) => void
+  onStop?: (this: Clip, el: HTMLElement) => void
   /**
    * 动画重置事件
    */
-  onReset?: (el: HTMLElement) => void
+  onReset?: (this: Clip, el: HTMLElement) => void
   /**
    * 动画更新前事件，此时样式还未改变
    */
-  onBeforeUpdate?: (el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
+  onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
   /**
    * 动画更新时事件，此时样式已经改变
    */
-  onUpdate?: (el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
+  onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
   /**
    * 动画完成事件
    */
-  onComplete?: (el: HTMLElement) => void
+  onComplete?: (this: Clip, el: HTMLElement) => void
 
   // 以下是不参与构建实例的属性
 
@@ -205,11 +205,11 @@ export class Clip {
       //free模式下
       if (this.free) {
         //animator触发beforeUpdate事件
-        this.parent!.onBeforeUpdate?.apply(this.parent, [this, this.parent!.$el!])
+        this.parent!.onBeforeUpdate?.apply(this.parent!, [this, this.parent!.$el!])
         //clip触发beforeUpdate事件
-        this.onBeforeUpdate?.apply(this.parent!, [this.parent!.$el!])
+        this.onBeforeUpdate?.apply(this, [this.parent!.$el!])
         //animator触发update事件
-        this.parent!.onUpdate?.apply(this.parent, [this, this.parent!.$el!])
+        this.parent!.onUpdate?.apply(this.parent!, [this, this.parent!.$el!])
         //clip触发update事件
         this.onUpdate?.apply(this, [this.parent!.$el!])
         //递归调用动画
@@ -220,7 +220,7 @@ export class Clip {
         //获取当前属性值
         const currentValue = this.getUnitCssValue()
         //animator触发beforeUpdate事件
-        this.parent!.onBeforeUpdate?.apply(this.parent, [this, this.parent!.$el!, this.style, currentValue])
+        this.parent!.onBeforeUpdate?.apply(this.parent!, [this, this.parent!.$el!, this.style, currentValue])
         //clip触发beforeUpdate事件
         this.onBeforeUpdate?.apply(this, [this.parent!.$el!, this.style, currentValue])
         //获取新的属性值
@@ -232,7 +232,7 @@ export class Clip {
           this.parent!.$el!.style.setProperty(this.style!, newValue + '', 'important')
         }
         //animator触发update事件
-        this.parent!.onUpdate?.apply(this.parent, [this, this.parent!.$el!, this.style, newValue])
+        this.parent!.onUpdate?.apply(this.parent!, [this, this.parent!.$el!, this.style, newValue])
         //clip触发update事件
         this.onUpdate?.apply(this, [this.parent!.$el!, this.style, newValue])
 
@@ -251,7 +251,7 @@ export class Clip {
           //动画运行结束，修改状态
           this.state = 3
           //animator触发complete事件
-          this.parent!.onComplete?.apply(this.parent, [this, this.parent!.$el!])
+          this.parent!.onComplete?.apply(this.parent!, [this, this.parent!.$el!])
           //clip触发complete事件
           this.onComplete?.apply(this, [this.parent!.$el!])
           //调用clip自身的chain型clip
@@ -278,7 +278,27 @@ export class Clip {
   /**
    * 停止动画
    */
-  stop() {}
+  stop() {
+    if (!this.parent || !this.parent.$el) {
+      throw new Error('The clip has not been added to the animator')
+    }
+    //非运行状态的动画帧无法停止
+    if (this.state != 1) {
+      return this
+    }
+    //恢复初始的时间戳
+    this.timeStamp = 0
+    //恢复初始间隔时间
+    this.interval = 0
+    //修改状态
+    this.state = 2
+    //animator触发stop事件
+    this.parent.onStop?.apply(this.parent, [this, this.parent.$el])
+    //clip触发stop事件
+    this.onStop?.apply(this, [this.parent.$el])
+    //返回clip实例
+    return this
+  }
 
   /**
    * 重置动画
@@ -316,12 +336,46 @@ export class Clip {
   /**
    * 链式调用动画
    */
-  chain() {}
+  chain(clip: Clip) {
+    if (clip.parent) {
+      throw new Error('The clip has been added to an animator instance and cannot be passed as a chain argument')
+    }
+    clip.type = 1
+    this.chainClip = clip
+    return clip
+  }
 
   /**
    * 主动触发完成事件
    */
-  emitComplete() {}
+  emitComplete() {
+    if (!this.parent || !this.parent.$el) {
+      throw new Error('The clip has not been added to the animator')
+    }
+    //非free模式无效
+    if (!this.free) {
+      return
+    }
+    if (this.state == 0 || this.state == 3) {
+      return
+    }
+    //动画运行结束，修改状态
+    this.state = 3
+    //animator触发complete事件
+    this.parent.onComplete?.apply(this.parent, [this, this.parent.$el])
+    //clip触发complete事件
+    this.onComplete?.apply(this, [this.parent.$el])
+    //调用clip自身的chain型clip
+    if (this.chainClip) {
+      //chain型clip如果已经加入到animator中
+      if (this.parent.hasClip(this.chainClip)) {
+        this.parent.removeClip(this.chainClip).addClip(this.chainClip)
+      } else {
+        this.parent.addClip(this.chainClip)
+      }
+      this.chainClip.start()
+    }
+  }
 
   /**
    * 获取元素基于单位unit的值
