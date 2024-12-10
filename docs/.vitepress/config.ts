@@ -21,6 +21,7 @@ export default defineConfig({
     },
     nav: [
       { text: '指南', link: '/guide/introduction', activeMatch: '/guide' },
+      { text: '演示', link: '/demo' },
       { text: '更新日志', link: '/changelog' }
     ],
     sidebar: {

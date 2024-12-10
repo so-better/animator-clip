@@ -133,7 +133,7 @@ export class Animator {
     }
     //更新children
     const index = this.children.findIndex(item => item.key == clip.key)
-    this.children = this.children.splice(index, 1)
+    this.children.splice(index, 1)
     //重置初始状态
     clip.state = 0
     //恢复初始的时间戳
