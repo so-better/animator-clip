@@ -2,7 +2,7 @@
 lastUpdated: false
 aside: false
 layout: home
-title: JS动画库
+title: 主页
 
 hero:
   name: animator-clip
