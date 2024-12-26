@@ -22,6 +22,7 @@ export default defineConfig({
     nav: [
       { text: '指南', link: '/guide/introduction', activeMatch: '/guide' },
       { text: '演示', link: '/demo' },
+      { text: '反馈', link: 'https://www.so-better.cn/feedback', target: '_blank' },
       { text: '更新日志', link: '/changelog' }
     ],
     sidebar: {
