@@ -1,2 +1,2 @@
-export * from '@/model/animator'
-export * from '@/model/clip'
+export * from './model/animator'
+export * from './model/clip'

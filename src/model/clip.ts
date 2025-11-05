@@ -10,15 +10,15 @@ export type ClipOptionsType = {
   /**
    * 样式名称
    */
-  style: keyof CSS.Properties
+  style?: keyof CSS.Properties
   /**
    * 样式最终值
    */
-  value: string | number
+  value?: string | number
   /**
    * 动画速度，即每次改变的量
    */
-  speed: number
+  speed?: number
   /**
    * 是否自由模式
    */
@@ -139,7 +139,7 @@ export class Clip {
 
   constructor(options: ClipOptionsType) {
     this.free = options.free ?? false
-    if (!this.free) {
+    if (!this.free && options.value) {
       this.style = options.style
       this.speed = options.speed
       this.value = typeof options.value == 'number' ? options.value : parseFloat(options.value)

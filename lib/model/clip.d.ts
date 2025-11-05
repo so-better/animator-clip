@@ -7,15 +7,15 @@ export type ClipOptionsType = {
     /**
      * 样式名称
      */
-    style: keyof CSS.Properties;
+    style?: keyof CSS.Properties;
     /**
      * 样式最终值
      */
-    value: string | number;
+    value?: string | number;
     /**
      * 动画速度，即每次改变的量
      */
-    speed: number;
+    speed?: number;
     /**
      * 是否自由模式
      */
