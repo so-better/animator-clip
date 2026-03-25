@@ -139,7 +139,7 @@ export class Clip {
 
   constructor(options: ClipOptionsType) {
     this.free = options.free ?? false
-    if (!this.free && options.value) {
+    if (!this.free && options.value !== undefined) {
       this.style = options.style
       this.speed = options.speed
       this.value = typeof options.value == 'number' ? options.value : parseFloat(options.value)
@@ -163,6 +163,10 @@ export class Clip {
     }
     //非free模式下进行属性值判断
     if (!this.free) {
+      //speed为0时无法推进动画，直接返回
+      if (this.speed === 0) {
+        return this
+      }
       //获取初始属性值
       const oldValue = this.getUnitCssValue()
       //如果属性为渐增的且属性值已经超过目标属性值大小，则不进行动画
