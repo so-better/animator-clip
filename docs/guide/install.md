@@ -54,17 +54,17 @@ npm install animator-clip@1.4.7
 ```
 
 ```bash [yarn]
-yarn install animator-clip
+yarn add animator-clip
 
 # 安装指定版本
-yarn install animator-clip@1.4.7
+yarn add animator-clip@1.4.7
 ```
 
 ```bash [pnpm]
-pnpm install animator-clip
+pnpm add animator-clip
 
 # 安装指定版本
-pnpm install animator-clip@1.4.7
+pnpm add animator-clip@1.4.7
 ```
 
 :::
