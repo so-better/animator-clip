@@ -35,11 +35,11 @@ export type ClipOptionsType = {
     /**
      * 动画更新前事件，此时样式还未改变
      */
-    onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void;
+    onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void;
     /**
      * 动画更新时事件，此时样式已经改变
      */
-    onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void;
+    onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void;
     /**
      * 动画完成事件
      */
@@ -80,11 +80,11 @@ export declare class Clip {
     /**
      * 动画更新前事件，此时样式还未改变
      */
-    onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void;
+    onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void;
     /**
      * 动画更新时事件，此时样式已经改变
      */
-    onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void;
+    onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void;
     /**
      * 动画完成事件
      */
@@ -108,7 +108,7 @@ export declare class Clip {
     /**
      * requestAnimationFrame动画API
      */
-    requestAnimationFrame: typeof window.requestAnimationFrame | ((callback: () => number) => number);
+    requestAnimationFrame: (callback: FrameRequestCallback) => number;
     /**
      * 动画状态，0表示动画初始状态，1表示动画进行状态，2表示动画停止状态，3表示动画完成状态
      */

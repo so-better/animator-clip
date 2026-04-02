@@ -50,11 +50,11 @@ const clip = new Clip(options)
 
   动画重置事件，回调参数为绑定的 `dom` 元素
 
-- onBeforeUpdate <Badge type="danger" text="(this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void" />
+- onBeforeUpdate <Badge type="danger" text="(this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void" />
 
   动画更新前触发事件，此时该帧的样式还未改变，回调参数依次为绑定的 `dom` 元素、元素动画相关的样式和元素动画更新时还未改变的值
 
-- onUpdate <Badge type="danger" text="(this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void" />
+- onUpdate <Badge type="danger" text="(this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void" />
 
   动画更新时触发事件，此时该帧的样式已经改变，回调参数依次为绑定的 `dom` 元素、元素动画相关的样式和元素动画更新时已经改变的值
 
@@ -121,7 +121,7 @@ const clip = new Clip(options)
 - 示例
 
   ```ts
-  console.log(clip.inertval) // 0
+  console.log(clip.interval) // 0
   ```
 
 ##### start()
@@ -205,6 +205,7 @@ const clip = new Clip(options)
 - 示例
 
   ```ts
+  animator.addClip(clip)
   clip.chain(clip2)
   clip.start()
   //当clip执行完毕后会自动接着执行clip2的动画

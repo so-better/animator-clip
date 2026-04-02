@@ -38,11 +38,11 @@ export type ClipOptionsType = {
   /**
    * 动画更新前事件，此时样式还未改变
    */
-  onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
+  onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
   /**
    * 动画更新时事件，此时样式已经改变
    */
-  onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
+  onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
   /**
    * 动画完成事件
    */
@@ -84,11 +84,11 @@ export class Clip {
   /**
    * 动画更新前事件，此时样式还未改变
    */
-  onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
+  onBeforeUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
   /**
    * 动画更新时事件，此时样式已经改变
    */
-  onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: string | number) => void
+  onUpdate?: (this: Clip, el: HTMLElement, style?: keyof CSS.Properties, value?: number) => void
   /**
    * 动画完成事件
    */
@@ -115,7 +115,7 @@ export class Clip {
   /**
    * requestAnimationFrame动画API
    */
-  requestAnimationFrame: typeof window.requestAnimationFrame | ((callback: () => number) => number)
+  requestAnimationFrame: (callback: FrameRequestCallback) => number
   /**
    * 动画状态，0表示动画初始状态，1表示动画进行状态，2表示动画停止状态，3表示动画完成状态
    */
@@ -319,7 +319,7 @@ export class Clip {
     this.interval = 0
     //修改状态
     this.state = 0
-    //非free模式下如果reStoreStyle是true则恢复元素的初始属性值
+    //非free模式下如果resetStyle是true则恢复元素的初始属性值
     if (!this.free && resetStyle) {
       this.parent.$el.style.setProperty(this.style!, this.initValue + '', 'important')
     }
@@ -405,12 +405,12 @@ export class Clip {
       return window.requestAnimationFrame
     }
     let lastTime = 0
-    return function (callback: () => number) {
+    return function (callback: FrameRequestCallback) {
       let currTime = Date.now()
       let timeToCall = Math.max(0, 1000 / 60 - (currTime - lastTime))
-      window.setTimeout(callback, timeToCall)
+      const id = window.setTimeout(() => callback(currTime + timeToCall), timeToCall)
       lastTime = currTime + timeToCall
-      return 1
+      return id
     }
   }
 

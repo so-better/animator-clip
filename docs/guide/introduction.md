@@ -6,7 +6,7 @@ title: 简介
 
 ## 基本介绍
 
-`animator-clip` 是一个基于 `JavaScript` 的 `requestAnimationFrame API` 封装的轻量级 `JS` 动画插件，在不支持 `requestAnimationFrame` `语法的浏览器中，animator-clip` 能够使用 `setTimeout` 模拟做到兼容，可以放心在这类浏览器中使用。
+`animator-clip` 是一个基于 `JavaScript` 的 `requestAnimationFrame API` 封装的轻量级 `JS` 动画插件，在不支持 `requestAnimationFrame` 语法的浏览器中，`animator-clip` 能够使用 `setTimeout` 模拟做到兼容，可以放心在这类浏览器中使用。
 
 尽量在现代浏览器中使用此插件，对于 `IE` 等老旧浏览器，本插件尚未进行测试
 

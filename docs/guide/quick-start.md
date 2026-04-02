@@ -30,8 +30,8 @@ const animator = new Animator(el, options)
 创建 `Clip` 实例
 
 ```ts
-//clip实例创建时，构造函数只有一个参数，也可以没有
-const clip = new Clip([options])
+//clip实例创建时，构造函数只有一个参数，参数内所有属性均为可选
+const clip = new Clip(options)
 ```
 
 将 `clip` 添加到 `animator` 中

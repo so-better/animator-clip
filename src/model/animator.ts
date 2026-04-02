@@ -82,9 +82,6 @@ export class Animator {
    * 判断是否包含某个clip
    */
   hasClip(clip: Clip) {
-    if (!clip.parent) {
-      return false
-    }
     if (!this.children.length) {
       return false
     }
@@ -157,10 +154,8 @@ export class Animator {
    * 移除全部clip
    */
   removeAllClips() {
-    let i = 0
-    while (i < this.children.length) {
-      const clip = this.children[i]
-      this.removeClip(clip)
+    while (this.children.length) {
+      this.removeClip(this.children[0])
     }
     return this
   }
