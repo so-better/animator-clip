@@ -1,3 +1,8 @@
+---
+name: release
+description: animator-clip 完整发布流程，涵盖版本号更新、源码打包、文档更新检查、changelog 维护、文档打包、README 更新、npm 发布，每步均需用户确认后执行。
+---
+
 # animator-clip 发布流程
 
 > **核心规则**：Step 1-7 每步执行前必须向用户确认，获得确认后再执行。任意步骤出错则停止并告知原因，等待用户指示。
