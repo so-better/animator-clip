@@ -6,7 +6,7 @@ title: 安装
 
 ## 下载 animator-clip 本地到使用
 
-- 下载地址：[animator-clip](https://registry.npmmirror.com/animator-clip/download/animator-clip-1.4.8.tgz)
+- 下载地址：[animator-clip](https://registry.npmmirror.com/animator-clip/download/animator-clip-1.4.10.tgz)
 - 下载完成后最终解压得到一个 package 文件夹，进入 package 文件夹后，将 package 目录下的整个 lib 目录拷贝到你的项目下
 - 在 html 页面中引入 js
 
@@ -28,7 +28,7 @@ title: 安装
 
 ```html
 <!-- 引入固定版本的animator-clip -->
-<script src="https://unpkg.com/animator-clip@1.4.8/lib/animator-clip.umd.js"></script>
+<script src="https://unpkg.com/animator-clip@1.4.10/lib/animator-clip.umd.js"></script>
 <!-- 始终引入最新的animator-clip -->
 <script src="https://unpkg.com/animator-clip/lib/animator-clip.umd.js"></script>
 ```
@@ -50,21 +50,21 @@ title: 安装
 npm install animator-clip
 
 # 安装指定版本
-npm install animator-clip@1.4.8
+npm install animator-clip@1.4.10
 ```
 
 ```bash [yarn]
 yarn add animator-clip
 
 # 安装指定版本
-yarn add animator-clip@1.4.8
+yarn add animator-clip@1.4.10
 ```
 
 ```bash [pnpm]
 pnpm add animator-clip
 
 # 安装指定版本
-pnpm add animator-clip@1.4.8
+pnpm add animator-clip@1.4.10
 ```
 
 :::
