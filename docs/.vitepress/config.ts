@@ -24,7 +24,7 @@ export default defineConfig({
       { text: '更新日志', link: '/changelog' },
       {
         text: '在线体验',
-        link: 'https://www.so-better.cn/run?lib=animator-clip',
+        link: 'https://www.so-better.cn/playground?lib=animator-clip',
         target: '_blank'
       },
       {
